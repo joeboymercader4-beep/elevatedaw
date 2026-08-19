@@ -269,7 +269,7 @@ background: crimson;
 box-shadow: 0 0 8px crimson;
 }
 
-/* MODIFIED: User Info Card Support for Background GIF */
+/* User Info Card Support for Background GIF */
 .team-card {
 background: rgba(10, 10, 10, 0.85);
 background-size: cover;
@@ -288,7 +288,6 @@ transition: all 0.3s ease;
 overflow: hidden;
 }
 
-/* Semi-transparent dark overlay inside card for readability */
 .team-card::before {
 content: '';
 position: absolute;
@@ -465,8 +464,8 @@ display: block;
 
 <!-- Welcome Entry Overlay Screen -->
 <div id="welcome-screen">
-<div class="welcome-title">WELCOME TO ELEVATE</div>
-<button class="welcome-btn" onclick="enterWebsite()">ENTER WEBSITE</button>
+<div class="welcome-title">ELEVATE ANO TARA?</div>
+<button class="welcome-btn" onclick="enterWebsite()">CLICK MO MUNA!</button>
 </div>
 
 <!-- Admin Dropdown Menu -->
@@ -502,7 +501,7 @@ display: block;
 <button class="banner-admin-btn" onclick="openBannerCustomizeModal()">✏ EDIT BANNER</button>
 </div>
 
-<h2 style="color: rgb(228, 228, 228); margin-bottom: 25px;">THE TEAM</h2>
+<h2 style="color: rgb(228, 228, 228); margin-bottom: 25px;">TEAM</h2>
 <div id="team-hierarchy" class="team-hierarchy"></div>
 </div>
 
@@ -682,12 +681,12 @@ const fbIcon = `<svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325
 // === CLOUD SAVE FUNCTION ===
 function saveToDatabase() {
 const fullPayload = {
-    teamMembers,
-    memberAccessPin,
-    bannerStyleConfig,
-    memberBtnStyleConfig,
-    globalBgMusic,
-    customTopBanner
+teamMembers,
+memberAccessPin,
+bannerStyleConfig,
+memberBtnStyleConfig,
+globalBgMusic,
+customTopBanner
 };
 db.ref('cyberHubData').set(fullPayload);
 }
@@ -695,27 +694,27 @@ db.ref('cyberHubData').set(fullPayload);
 // === REALTIME LISTEN FROM CLOUD (PC & MOBILE AUTO SYNC) ===
 function listenToCloud() {
 db.ref('cyberHubData').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-        if (data.teamMembers) teamMembers = data.teamMembers;
-        if (data.memberAccessPin) memberAccessPin = data.memberAccessPin;
-        if (data.bannerStyleConfig) bannerStyleConfig = data.bannerStyleConfig;
-        if (data.memberBtnStyleConfig) memberBtnStyleConfig = data.memberBtnStyleConfig;
-        if (data.globalBgMusic) globalBgMusic = data.globalBgMusic;
-        if (data.customTopBanner !== undefined) customTopBanner = data.customTopBanner;
+const data = snapshot.val();
+if (data) {
+    if (data.teamMembers) teamMembers = data.teamMembers;
+    if (data.memberAccessPin) memberAccessPin = data.memberAccessPin;
+    if (data.bannerStyleConfig) bannerStyleConfig = data.bannerStyleConfig;
+    if (data.memberBtnStyleConfig) memberBtnStyleConfig = data.memberBtnStyleConfig;
+    if (data.globalBgMusic) globalBgMusic = data.globalBgMusic;
+    if (data.customTopBanner !== undefined) customTopBanner = data.customTopBanner;
 
-        renderTeam();
-        loadSavedBanner();
-        applyMemberBtnStyles();
+    renderTeam();
+    loadSavedBanner();
+    applyMemberBtnStyles();
 
-        if (audio.src !== globalBgMusic) {
-            audio.src = globalBgMusic;
-        }
-
-        if (document.getElementById('manager-modal').style.display === 'flex') {
-            renderManagerLists();
-        }
+    if (audio.src !== globalBgMusic) {
+        audio.src = globalBgMusic;
     }
+
+    if (document.getElementById('manager-modal').style.display === 'flex') {
+        renderManagerLists();
+    }
+}
 });
 }
 
@@ -725,24 +724,60 @@ welcomeScreen.style.opacity = '0';
 welcomeScreen.style.visibility = 'hidden';
 
 if (globalBgMusic) {
-    audio.src = globalBgMusic;
-    audio.volume = 0.5;
-    audio.play().then(() => updateAudioUI()).catch(err => console.log("Audio deferred:", err));
+audio.src = globalBgMusic;
+audio.volume = 0.5;
+audio.play().then(() => updateAudioUI()).catch(err => console.log("Audio deferred:", err));
 }
 }
 
 function checkAdminAccess() {
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('admin') === "true" || urlParams.get('admin') === ADMIN_PIN) {
-    showAdminPanel();
+showAdminPanel();
 }
 }
 
+function showAdminPanel() { document.getElementById('admin-menu-wrapper').style.display = 'block'; }
+
+// ==================== SHORTCUTS & MOBILE GESTURES ====================
+
+// PC Keyboard Shortcut: Ctrl + Shift + A
 window.addEventListener('keydown', function(e) {
 if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') showAdminPanel();
 });
 
-function showAdminPanel() { document.getElementById('admin-menu-wrapper').style.display = 'block'; }
+// Mobile Gesture 1: Triple-Tap Anywhere on Screen
+let mobileTouchCount = 0;
+let mobileTouchTimer = null;
+
+window.addEventListener('touchend', function(e) {
+// Pigilan kung button o input ang tinitip
+if (['BUTTON', 'INPUT', 'A', 'SELECT'].includes(e.target.tagName)) return;
+
+mobileTouchCount++;
+if (mobileTouchCount === 1) {
+    mobileTouchTimer = setTimeout(() => { mobileTouchCount = 0; }, 500);
+} else if (mobileTouchCount === 3) {
+    clearTimeout(mobileTouchTimer);
+    mobileTouchCount = 0;
+    showAdminPanel();
+}
+});
+
+// Mobile Gesture 2: Long Press (2 Seconds) Anywhere on Screen
+let longPressTimer;
+
+window.addEventListener('touchstart', function(e) {
+if (['BUTTON', 'INPUT', 'A', 'SELECT'].includes(e.target.tagName)) return;
+longPressTimer = setTimeout(() => {
+    showAdminPanel();
+}, 2000);
+});
+
+window.addEventListener('touchend', function(e) { clearTimeout(longPressTimer); });
+window.addEventListener('touchmove', function(e) { clearTimeout(longPressTimer); });
+
+// ======================================================================
 
 function openBgMusicModal() {
 if(!isAdminAuthorized) return;
@@ -754,12 +789,12 @@ function closeBgMusicModal() { document.getElementById('bg-music-modal').style.d
 function handleLocalBgMusicUpload(input) {
 const file = input.files[0];
 if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        globalBgMusic = e.target.result;
-        document.getElementById('bg-music-url').value = "[ Local File Loaded ]";
-    };
-    reader.readAsDataURL(file);
+const reader = new FileReader();
+reader.onload = function(e) {
+    globalBgMusic = e.target.result;
+    document.getElementById('bg-music-url').value = "[ Local File Loaded ]";
+};
+reader.readAsDataURL(file);
 }
 }
 
@@ -776,10 +811,10 @@ closeBgMusicModal();
 function toggleAudio() {
 if (!audio.src) return alert("No audio track loaded.");
 if (audio.paused) {
-    audio.play().then(() => updateAudioUI());
+audio.play().then(() => updateAudioUI());
 } else {
-    audio.pause();
-    updateAudioUI();
+audio.pause();
+updateAudioUI();
 }
 }
 
@@ -787,23 +822,23 @@ function updateAudioUI() {
 const adminBtn = document.getElementById('admin-audio-toggle-btn');
 const floatBtn = document.getElementById('float-audio-btn');
 if (audio.paused) {
-    if(adminBtn) adminBtn.textContent = "▶ PLAY AUDIO";
-    if(floatBtn) floatBtn.textContent = "▶ BGM: PAUSED";
+if(adminBtn) adminBtn.textContent = "▶ PLAY AUDIO";
+if(floatBtn) floatBtn.textContent = "▶ BGM: PAUSED";
 } else {
-    if(adminBtn) adminBtn.textContent = "⏸ PAUSE AUDIO";
-    if(floatBtn) floatBtn.textContent = "⏸ BGM: PLAYING";
+if(adminBtn) adminBtn.textContent = "⏸ PAUSE AUDIO";
+if(floatBtn) floatBtn.textContent = "⏸ BGM: PLAYING";
 }
 }
 
 function applyMemberBtnStyles() {
 if (memberBtnStyleConfig) {
-    document.documentElement.style.setProperty('--m-btn-bg', memberBtnStyleConfig.bg || 'rgba(220, 20, 60, 0.1)');
-    document.documentElement.style.setProperty('--m-btn-color', memberBtnStyleConfig.color || '#dc143c');
-    document.documentElement.style.setProperty('--m-btn-border-color', memberBtnStyleConfig.borderColor || '#dc143c');
-    document.documentElement.style.setProperty('--m-btn-hover-bg', memberBtnStyleConfig.hoverBg || '#dc143c');
-    document.documentElement.style.setProperty('--m-btn-hover-color', memberBtnStyleConfig.hoverColor || '#000000');
-    document.documentElement.style.setProperty('--m-btn-border-style', memberBtnStyleConfig.borderStyle || 'solid');
-    document.documentElement.style.setProperty('--m-btn-radius', `${memberBtnStyleConfig.radius || 4}px`);
+document.documentElement.style.setProperty('--m-btn-bg', memberBtnStyleConfig.bg || 'rgba(220, 20, 60, 0.1)');
+document.documentElement.style.setProperty('--m-btn-color', memberBtnStyleConfig.color || '#dc143c');
+document.documentElement.style.setProperty('--m-btn-border-color', memberBtnStyleConfig.borderColor || '#dc143c');
+document.documentElement.style.setProperty('--m-btn-hover-bg', memberBtnStyleConfig.hoverBg || '#dc143c');
+document.documentElement.style.setProperty('--m-btn-hover-color', memberBtnStyleConfig.hoverColor || '#000000');
+document.documentElement.style.setProperty('--m-btn-border-style', memberBtnStyleConfig.borderStyle || 'solid');
+document.documentElement.style.setProperty('--m-btn-radius', `${memberBtnStyleConfig.radius || 4}px`);
 }
 }
 
@@ -811,11 +846,11 @@ function applyBannerStyles() {
 const container = document.getElementById('banner-container');
 const img = document.getElementById('top-banner-img');
 if (bannerStyleConfig) {
-    container.style.height = `${bannerStyleConfig.height || 220}px`;
-    container.style.borderStyle = bannerStyleConfig.borderStyle || 'dashed';
-    container.style.borderColor = bannerStyleConfig.borderColor || 'crimson';
-    container.style.boxShadow = `0 0 ${bannerStyleConfig.glow || 15}px ${bannerStyleConfig.borderColor || 'crimson'}`;
-    img.style.objectFit = bannerStyleConfig.fit || 'cover';
+container.style.height = `${bannerStyleConfig.height || 220}px`;
+container.style.borderStyle = bannerStyleConfig.borderStyle || 'dashed';
+container.style.borderColor = bannerStyleConfig.borderColor || 'crimson';
+container.style.boxShadow = `0 0 ${bannerStyleConfig.glow || 15}px ${bannerStyleConfig.borderColor || 'crimson'}`;
+img.style.objectFit = bannerStyleConfig.fit || 'cover';
 }
 }
 
@@ -829,10 +864,10 @@ function handleBannerFallback() { showBannerPlaceholder(); }
 function loadSavedBanner() {
 applyBannerStyles();
 if (customTopBanner) {
-    const bannerImg = document.getElementById('top-banner-img');
-    bannerImg.src = customTopBanner;
-    bannerImg.style.display = 'block';
-    document.getElementById('banner-placeholder-text').style.display = 'none';
+const bannerImg = document.getElementById('top-banner-img');
+bannerImg.src = customTopBanner;
+bannerImg.style.display = 'block';
+document.getElementById('banner-placeholder-text').style.display = 'none';
 }
 }
 
@@ -840,13 +875,13 @@ function handleBannerUpload(input) {
 if (!isAdminAuthorized) return;
 const file = input.files[0];
 if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        customTopBanner = e.target.result;
-        saveToDatabase();
-        input.value = "";
-    };
-    reader.readAsDataURL(file);
+const reader = new FileReader();
+reader.onload = function(e) {
+    customTopBanner = e.target.result;
+    saveToDatabase();
+    input.value = "";
+};
+reader.readAsDataURL(file);
 }
 }
 
@@ -866,11 +901,11 @@ function closeBannerCustomizeModal() { document.getElementById('banner-customize
 function saveBannerCustomizations() {
 if (!isAdminAuthorized) return;
 bannerStyleConfig = {
-    height: document.getElementById('b-height').value.trim() || "220",
-    borderStyle: document.getElementById('b-border-style').value,
-    borderColor: document.getElementById('b-color-text').value.trim() || "crimson",
-    glow: document.getElementById('b-glow').value.trim() || "15",
-    fit: document.getElementById('b-fit').value
+height: document.getElementById('b-height').value.trim() || "220",
+borderStyle: document.getElementById('b-border-style').value,
+borderColor: document.getElementById('b-color-text').value.trim() || "crimson",
+glow: document.getElementById('b-glow').value.trim() || "15",
+fit: document.getElementById('b-fit').value
 };
 saveToDatabase();
 closeBannerCustomizeModal();
@@ -893,13 +928,13 @@ function closeBtnCustomizeModal() { document.getElementById('btn-customize-modal
 function saveBtnCustomizations() {
 if (!isAdminAuthorized) return;
 memberBtnStyleConfig = {
-    bg: document.getElementById('mb-bg-text').value.trim() || "rgba(220, 20, 60, 0.1)",
-    color: document.getElementById('mb-text-text').value.trim() || "#dc143c",
-    borderColor: document.getElementById('mb-border-text').value.trim() || "#dc143c",
-    hoverBg: document.getElementById('mb-hbg-text').value.trim() || "#dc143c",
-    hoverColor: document.getElementById('mb-htext-text').value.trim() || "#000000",
-    borderStyle: document.getElementById('mb-border-style').value,
-    radius: document.getElementById('mb-radius').value.trim() || "4"
+bg: document.getElementById('mb-bg-text').value.trim() || "rgba(220, 20, 60, 0.1)",
+color: document.getElementById('mb-text-text').value.trim() || "#dc143c",
+borderColor: document.getElementById('mb-border-text').value.trim() || "#dc143c",
+hoverBg: document.getElementById('mb-hbg-text').value.trim() || "#dc143c",
+hoverColor: document.getElementById('mb-htext-text').value.trim() || "#000000",
+borderStyle: document.getElementById('mb-border-style').value,
+radius: document.getElementById('mb-radius').value.trim() || "4"
 };
 saveToDatabase();
 closeBtnCustomizeModal();
@@ -908,17 +943,17 @@ closeBtnCustomizeModal();
 function toggleAdminMenu() {
 const dropdown = document.getElementById('admin-dropdown');
 if (!isAdminAuthorized) {
-    const pinInput = prompt("ENTER ADMIN SECURITY PIN:");
-    if (pinInput === ADMIN_PIN) {
-        isAdminAuthorized = true;
-        document.body.classList.add('is-admin');
-        dropdown.classList.add('active');
-        alert("Admin Granted.");
-    } else if (pinInput !== null) {
-        alert("ACCESS DENIED: Wrong PIN.");
-    }
+const pinInput = prompt("ENTER ADMIN SECURITY PIN:");
+if (pinInput === ADMIN_PIN) {
+    isAdminAuthorized = true;
+    document.body.classList.add('is-admin');
+    dropdown.classList.add('active');
+    alert("Admin Granted.");
+} else if (pinInput !== null) {
+    alert("ACCESS DENIED: Wrong PIN.");
+}
 } else {
-    dropdown.classList.toggle('active');
+dropdown.classList.toggle('active');
 }
 }
 
@@ -926,9 +961,9 @@ function setMemberPin() {
 if (!isAdminAuthorized) return;
 const newPin = prompt("Enter New Member Access Password/PIN:", memberAccessPin);
 if (newPin !== null && newPin.trim() !== "") {
-    memberAccessPin = newPin.trim();
-    saveToDatabase();
-    alert("Member Access PIN updated!");
+memberAccessPin = newPin.trim();
+saveToDatabase();
+alert("Member Access PIN updated!");
 }
 }
 
@@ -943,39 +978,39 @@ alert("Logged out of Admin Access.");
 function resetDatabase() {
 if (!isAdminAuthorized) return;
 if (confirm("Reset ALL stored cloud data?")) {
-    teamMembers = [];
-    customTopBanner = "";
-    globalBgMusic = "assets/bg-music.mp3";
-    memberAccessPin = "1234";
-    bannerStyleConfig = { height: "220", borderStyle: "dashed", borderColor: "#dc143c", glow: "15", fit: "cover" };
-    memberBtnStyleConfig = { bg: "rgba(220, 20, 60, 0.1)", color: "#dc143c", borderColor: "#dc143c", hoverBg: "#dc143c", hoverColor: "#000000", borderStyle: "solid", radius: "4" };
-    saveToDatabase();
+teamMembers = [];
+customTopBanner = "";
+globalBgMusic = "assets/bg-music.mp3";
+memberAccessPin = "1234";
+bannerStyleConfig = { height: "220", borderStyle: "dashed", borderColor: "#dc143c", glow: "15", fit: "cover" };
+memberBtnStyleConfig = { bg: "rgba(220, 20, 60, 0.1)", color: "#dc143c", borderColor: "#dc143c", hoverBg: "#dc143c", hoverColor: "#000000", borderStyle: "solid", radius: "4" };
+saveToDatabase();
 }
 }
 
 function previewAvatar(input) {
 const file = input.files[0];
 if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        currentAvatarBase64 = e.target.result;
-        document.getElementById('avatar-preview').src = currentAvatarBase64;
-    };
-    reader.readAsDataURL(file);
+const reader = new FileReader();
+reader.onload = function(e) {
+    currentAvatarBase64 = e.target.result;
+    document.getElementById('avatar-preview').src = currentAvatarBase64;
+};
+reader.readAsDataURL(file);
 }
 }
 
 function previewCardBg(input) {
 const file = input.files[0];
 if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        currentCardBgBase64 = e.target.result;
-        const bgPrev = document.getElementById('card-bg-preview');
-        bgPrev.src = currentCardBgBase64;
-        bgPrev.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+const reader = new FileReader();
+reader.onload = function(e) {
+    currentCardBgBase64 = e.target.result;
+    const bgPrev = document.getElementById('card-bg-preview');
+    bgPrev.src = currentCardBgBase64;
+    bgPrev.style.display = 'block';
+};
+reader.readAsDataURL(file);
 }
 }
 
@@ -992,33 +1027,33 @@ if(!isAdminAuthorized) return;
 editMemberIndex = index;
 
 if (index >= 0 && index < teamMembers.length) {
-    const member = teamMembers[index];
-    document.getElementById('modal-title').textContent = "EDIT CREW MEMBER";
-    document.getElementById('m-name').value = member.name || '';
-    document.getElementById('m-role').value = member.role || '';
-    document.getElementById('m-ig').value = member.ig || '';
-    document.getElementById('m-fb').value = member.fb || '';
-    currentAvatarBase64 = member.img || '';
-    document.getElementById('avatar-preview').src = member.img || '';
+const member = teamMembers[index];
+document.getElementById('modal-title').textContent = "EDIT CREW MEMBER";
+document.getElementById('m-name').value = member.name || '';
+document.getElementById('m-role').value = member.role || '';
+document.getElementById('m-ig').value = member.ig || '';
+document.getElementById('m-fb').value = member.fb || '';
+currentAvatarBase64 = member.img || '';
+document.getElementById('avatar-preview').src = member.img || '';
 
-    currentCardBgBase64 = member.cardBg || '';
-    const bgPrev = document.getElementById('card-bg-preview');
-    if (currentCardBgBase64) {
-        bgPrev.src = currentCardBgBase64;
-        bgPrev.style.display = 'block';
-    } else {
-        bgPrev.src = '';
-        bgPrev.style.display = 'none';
-    }
+currentCardBgBase64 = member.cardBg || '';
+const bgPrev = document.getElementById('card-bg-preview');
+if (currentCardBgBase64) {
+    bgPrev.src = currentCardBgBase64;
+    bgPrev.style.display = 'block';
 } else {
-    document.getElementById('modal-title').textContent = "ADD CREW MEMBER";
-    document.getElementById('m-name').value = '';
-    document.getElementById('m-role').value = '';
-    document.getElementById('m-ig').value = '';
-    document.getElementById('m-fb').value = '';
-    currentAvatarBase64 = "";
-    document.getElementById('avatar-preview').src = "";
-    removeCardBg();
+    bgPrev.src = '';
+    bgPrev.style.display = 'none';
+}
+} else {
+document.getElementById('modal-title').textContent = "ADD CREW MEMBER";
+document.getElementById('m-name').value = '';
+document.getElementById('m-role').value = '';
+document.getElementById('m-ig').value = '';
+document.getElementById('m-fb').value = '';
+currentAvatarBase64 = "";
+document.getElementById('avatar-preview').src = "";
+removeCardBg();
 }
 document.getElementById('member-modal').style.display = 'flex'; 
 }
@@ -1051,9 +1086,9 @@ if (!name) return alert("Please enter a name.");
 const memberData = { name, role, img, cardBg, ig, fb };
 
 if (editMemberIndex >= 0 && editMemberIndex < teamMembers.length) {
-    teamMembers[editMemberIndex] = memberData;
+teamMembers[editMemberIndex] = memberData;
 } else {
-    teamMembers.push(memberData);
+teamMembers.push(memberData);
 }
 
 saveToDatabase();
@@ -1063,8 +1098,8 @@ closeMemberModal();
 function deleteMember(index) {
 if (!isAdminAuthorized) return;
 if (confirm("Delete this team member?")) {
-    teamMembers.splice(index, 1);
-    saveToDatabase();
+teamMembers.splice(index, 1);
+saveToDatabase();
 }
 }
 
@@ -1085,50 +1120,49 @@ const tier2 = teamMembers.filter(m => /co-leader|manager|core|developer|designer
 const tier3 = teamMembers.filter(m => !tier1.includes(m) && !tier2.includes(m));
 
 const tiers = [
-    { level: 1, members: tier1.length ? tier1 : (teamMembers.length ? [teamMembers[0]] : []) },
-    { level: 2, members: tier1.length ? tier2 : (teamMembers.length > 1 ? [teamMembers[1]] : []) },
-    { level: 3, members: tier1.length ? tier3 : teamMembers.slice(2) }
+{ level: 1, members: tier1.length ? tier1 : (teamMembers.length ? [teamMembers[0]] : []) },
+{ level: 2, members: tier1.length ? tier2 : (teamMembers.length > 1 ? [teamMembers[1]] : []) },
+{ level: 3, members: tier1.length ? tier3 : teamMembers.slice(2) }
 ];
 
 tiers.forEach(tier => {
-    if (tier.members.length === 0) return;
+if (tier.members.length === 0) return;
 
-    const tierDiv = document.createElement('div');
-    tierDiv.className = 'hierarchy-tier';
-    tierDiv.setAttribute('data-tier', tier.level);
+const tierDiv = document.createElement('div');
+tierDiv.className = 'hierarchy-tier';
+tierDiv.setAttribute('data-tier', tier.level);
 
-    tier.members.forEach((member) => {
-        const globalIndex = teamMembers.indexOf(member);
-        const card = document.createElement('div');
-        card.className = 'team-card';
+tier.members.forEach((member) => {
+    const globalIndex = teamMembers.indexOf(member);
+    const card = document.createElement('div');
+    card.className = 'team-card';
 
-        // Set card background image/GIF dynamically if exists
-        if (member.cardBg) {
-            card.style.backgroundImage = `url('${member.cardBg}')`;
-        }
+    if (member.cardBg) {
+        card.style.backgroundImage = `url('${member.cardBg}')`;
+    }
 
-        let socialsHtml = '';
-        if (member.ig || member.fb) {
-            socialsHtml += `<div class="team-socials">`;
-            if (member.ig) socialsHtml += `<a href="${member.ig}" target="_blank" class="social-icon-btn">${igIcon}</a>`;
-            if (member.fb) socialsHtml += `<a href="${member.fb}" target="_blank" class="social-icon-btn">${fbIcon}</a>`;
-            socialsHtml += `</div>`;
-        }
+    let socialsHtml = '';
+    if (member.ig || member.fb) {
+        socialsHtml += `<div class="team-socials">`;
+        if (member.ig) socialsHtml += `<a href="${member.ig}" target="_blank" class="social-icon-btn">${igIcon}</a>`;
+        if (member.fb) socialsHtml += `<a href="${member.fb}" target="_blank" class="social-icon-btn">${fbIcon}</a>`;
+        socialsHtml += `</div>`;
+    }
 
-        card.innerHTML = `
-            <div class="card-admin-controls">
-                <button class="card-admin-btn" onclick="openMemberModal(${globalIndex})">✏</button>
-                <button class="card-admin-btn" onclick="deleteMember(${globalIndex})">✖</button>
-            </div>
-            <img src="${member.img}" alt="${member.name}" class="team-avatar" onclick="openImgModal('${member.img}')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'80\\' height=\\'80\\'><rect width=\\'80\\' height=\\'80\\' fill=\\'%23111\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%23dc143c\\' font-size=\\'12\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>NO IMG</text></svg>'">
-            <div class="team-name">${member.name}</div>
-            <div class="team-role">${member.role}</div>
-            <div class="team-actions">${socialsHtml}</div>
-        `;
-        tierDiv.appendChild(card);
-    });
+    card.innerHTML = `
+        <div class="card-admin-controls">
+            <button class="card-admin-btn" onclick="openMemberModal(${globalIndex})">✏</button>
+            <button class="card-admin-btn" onclick="deleteMember(${globalIndex})">✖</button>
+        </div>
+        <img src="${member.img}" alt="${member.name}" class="team-avatar" onclick="openImgModal('${member.img}')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'80\\' height=\\'80\\'><rect width=\\'80\\' height=\\'80\\' fill=\\'%23111\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%23dc143c\\' font-size=\\'12\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>NO IMG</text></svg>'">
+        <div class="team-name">${member.name}</div>
+        <div class="team-role">${member.role}</div>
+        <div class="team-actions">${socialsHtml}</div>
+    `;
+    tierDiv.appendChild(card);
+});
 
-    container.appendChild(tierDiv);
+container.appendChild(tierDiv);
 });
 }
 
@@ -1136,24 +1170,24 @@ function renderManagerLists() {
 const list = document.getElementById('manager-team-list');
 list.innerHTML = '';
 if (teamMembers.length === 0) {
-    list.innerHTML = '<div style="color:#666; font-size:0.7rem; padding:5px;">No team members found.</div>';
-    return;
+list.innerHTML = '<div style="color:#666; font-size:0.7rem; padding:5px;">No team members found.</div>';
+return;
 }
 
 teamMembers.forEach((member, index) => {
-    const item = document.createElement('div');
-    item.className = 'manager-item';
-    item.innerHTML = `
-        <div class="manager-item-info">
-            <span class="manager-item-title">${member.name}</span>
-            <span class="manager-item-sub">${member.role}</span>
-        </div>
-        <div class="manager-item-actions">
-            <button class="sm-btn" onclick="openMemberModal(${index})">EDIT</button>
-            <button class="sm-btn" onclick="deleteMember(${index})">DELETE</button>
-        </div>
-    `;
-    list.appendChild(item);
+const item = document.createElement('div');
+item.className = 'manager-item';
+item.innerHTML = `
+    <div class="manager-item-info">
+        <span class="manager-item-title">${member.name}</span>
+        <span class="manager-item-sub">${member.role}</span>
+    </div>
+    <div class="manager-item-actions">
+        <button class="sm-btn" onclick="openMemberModal(${index})">EDIT</button>
+        <button class="sm-btn" onclick="deleteMember(${index})">DELETE</button>
+    </div>
+`;
+list.appendChild(item);
 });
 }
 
@@ -1176,10 +1210,10 @@ ctx.fillStyle = '#dc143c';
 ctx.font = `${fontSize}px monospace`;
 
 for (let i = 0; i < drops.length; i++) {
-    const text = chars.charAt(Math.floor(Math.random() * chars.length));
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-    drops[i]++;
+const text = chars.charAt(Math.floor(Math.random() * chars.length));
+ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+drops[i]++;
 }
 }
 setInterval(drawCanvas, 33);
