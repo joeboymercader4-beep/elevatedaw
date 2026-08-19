@@ -500,8 +500,59 @@ display: none !important;
 <canvas id="bg-canvas"></canvas>
 
 <!-- Hidden File Input for Top Banner Upload -->
-<input type="file" id="top-banner-input" accept="image/*" style="display: none;" onchange="handleBannerUpload(this)">
+<!-- Hidden File Input para sa Banner Upload (Tumatanggap na ng GIF at iba pang Image Types) -->
+<input type="file" id="top-banner-input" accept="image/gif, image/png, image/jpeg, image/webp" style="display: none;" onchange="handleBannerUpload(this)">
 
+<!-- Top Image Banner Frame -->
+<div class="team-top-banner" id="banner-container">
+    <img id="top-banner-img" 
+         src="assets/elevate-banner.gif" 
+         alt="Top Banner GIF" 
+         onerror="handleBannerFallback(this)">
+    <span id="banner-placeholder-text" class="banner-placeholder" style="display:none;">[ TOP BLANK IMAGE SLOT ]</span>
+    <button class="banner-admin-btn" onclick="openBannerCustomizeModal()">✏ EDIT BANNER</button>
+</div>
+
+<!-- Modal: Customize Banner Style & Image -->
+<div id="banner-customize-modal">
+    <div class="modal-content">
+        <h3>CUSTOMIZE BANNER</h3>
+
+        <label>Upload New Banner Image / GIF</label>
+        <input type="file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="handleBannerUpload(this)">
+
+        <label>Banner Height (px)</label>
+        <input type="text" id="b-height" placeholder="e.g. 220">
+
+        <label>Border Style</label>
+        <select id="b-border-style">
+            <option value="dashed">Dashed</option>
+            <option value="solid">Solid</option>
+            <option value="double">Double</option>
+            <option value="dotted">Dotted</option>
+        </select>
+
+        <label>Border & Glow Color</label>
+        <div class="color-input-group">
+            <input type="color" id="b-color-picker" value="#dc143c" onchange="document.getElementById('b-color-text').value = this.value">
+            <input type="text" id="b-color-text" placeholder="#dc143c" style="flex:1;">
+        </div>
+
+        <label>Glow Shadow Intensity (px)</label>
+        <input type="text" id="b-glow" placeholder="e.g. 15">
+
+        <label>Image Fit Style</label>
+        <select id="b-fit">
+            <option value="cover">Cover (Full Bleed)</option>
+            <option value="contain">Contain (Fit Whole Image)</option>
+        </select>
+
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBannerCustomizations()">SAVE</button>
+            <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBannerCustomizeModal()">CANCEL</button>
+        </div>
+    </div>
+</div>
 <!-- Single Main View: Team Page -->
 <div class="page-section">
 <!-- Top Image Banner Frame -->
