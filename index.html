@@ -430,32 +430,6 @@ background: #111;
 </head>
 <body>
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBQLI9qPA7-bbO8jG4I13KnJ3ZDGrpONJc",
-    authDomain: "elevate-9cbb2.firebaseapp.com",
-    databaseURL: "https://elevate-9cbb2-default-rtdb.firebaseio.com",
-    projectId: "elevate-9cbb2",
-    storageBucket: "elevate-9cbb2.firebasestorage.app",
-    messagingSenderId: "321202812524",
-    appId: "1:321202812524:web:a47c68690ed226210cca49",
-    measurementId: "G-R2PWYHTJGD"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-    
 <!-- Welcome Entry Overlay Screen -->
 <div id="welcome-screen">
 <div class="welcome-title">WELCOME TO ELEVATE</div>
@@ -630,25 +604,25 @@ background: #111;
 <audio id="bg-audio" loop preload="auto"></audio>
 
 <script>
+
 // ==================== FIREBASE CONFIGURATION ====================
-// PALITAN ANG MGA VALUES SA IBABA MULA SA FIREBASE CONSOLE MO:
+// 
 const firebaseConfig = {
-apiKey: "AIzaSyBQLI9qPA7-bbO8jG4I13KnJ3ZDGrpONJc",
+apiKey : "AIzaSyBQLI9qPA7-bbO8jG4I13KnJ3ZDGrpONJc", 
 authDomain: "elevate-9cbb2.firebaseapp.com",
 databaseURL: "https://elevate-9cbb2-default-rtdb.firebaseio.com",
 projectId: "elevate-9cbb2",
 storageBucket: "elevate-9cbb2.firebasestorage.app",
 messagingSenderId: "321202812524",
-appId: "1:321202812524:web:9dae041613662f2d0cca49",
-measurementId: "G-N2W12BCXVW"
+appId: "1:321202812524:web:a47c68690ed226210cca49"
 };
 
 // Initialize Firebase Realtime Database
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 // ================================================================
 
-const ADMIN_PIN = "0001";
+const ADMIN_PIN = "080205";
 let memberAccessPin = "1234"; 
 let isAdminAuthorized = false;
 
@@ -705,6 +679,7 @@ db.ref('cyberHubData').on('value', (snapshot) => {
     }
 });
 }
+
 
 function enterWebsite() {
 const welcomeScreen = document.getElementById('welcome-screen');
@@ -1134,6 +1109,7 @@ setInterval(drawCanvas, 33);
 // Initialize Cloud Connection
 listenToCloud();
 checkAdminAccess();
+</script>
 </script>
 </body>
 </html>
