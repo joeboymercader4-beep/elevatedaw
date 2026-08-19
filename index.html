@@ -86,6 +86,36 @@ width: 100%;
 .action-btn.danger { border-color: #ff3333; color: #ff3333; }
 .action-btn.danger:hover { background: #ff3333; color: #0a0a0a; }
 
+/* Fixed Background Music Control Bar (Para sa Bisita) */
+.bg-music-floating-bar {
+position: fixed;
+bottom: 15px;
+left: 15px;
+z-index: 300;
+background: rgba(10, 10, 10, 0.85);
+border: 1px solid crimson;
+border-radius: 20px;
+padding: 6px 14px;
+display: flex;
+align-items: center;
+gap: 10px;
+box-shadow: 0 0 12px rgba(220, 20, 60, 0.4);
+}
+
+.bg-music-floating-bar button {
+background: transparent;
+border: none;
+color: crimson;
+font-family: inherit;
+font-size: 0.75rem;
+font-weight: bold;
+cursor: pointer;
+}
+
+.bg-music-floating-bar button:hover {
+color: #fff;
+}
+
 /* Main Page Container */
 .page-section {
 display: flex;
@@ -348,7 +378,7 @@ cursor: pointer;
 .card-admin-btn:hover { color: crimson; }
 
 /* Modals Setup */
-#member-modal, #img-modal, #manager-modal, #banner-customize-modal, #btn-customize-modal {
+#member-modal, #img-modal, #manager-modal, #banner-customize-modal, #btn-customize-modal, #bg-music-modal {
 position: fixed;
 top: 0; left: 0;
 width: 100vw; height: 100vh;
@@ -487,14 +517,20 @@ display: none !important;
 <div id="admin-dropdown" class="admin-dropdown-menu">
     <button class="action-btn" onclick="openBannerCustomizeModal()">✏ CUSTOMIZE BANNER</button>
     <button class="action-btn" onclick="openBtnCustomizeModal()">🎨 CUSTOMIZE MEMBER BUTTONS</button>
+    <button class="action-btn" onclick="openBgMusicModal()">🎵 SET BACKGROUND MUSIC</button>
     <button class="action-btn" onclick="document.getElementById('top-banner-input').click()">+ SET BANNER IMAGE</button>
     <button class="action-btn" onclick="setMemberPin()">🔑 SET MEMBER PIN</button>
     <button class="action-btn" onclick="openMemberModal()">+ ADD MEMBER</button>
     <button class="action-btn" onclick="openManagerModal()">⚙ MANAGE DATA</button>
-    <button class="action-btn" id="audio-toggle-btn" onclick="toggleAudio()">⏸ PAUSE AUDIO</button>
+    <button class="action-btn" id="admin-audio-toggle-btn" onclick="toggleAudio()">⏸ PAUSE AUDIO</button>
     <button class="action-btn danger" onclick="resetDatabase()">RESET ALL DATA</button>
     <button class="action-btn danger" style="margin-top:5px; border-style:dashed;" onclick="logoutAdmin()">🔒 LOGOUT ADMIN</button>
 </div>
+</div>
+
+<!-- Floating Audio Controller for Visitors -->
+<div class="bg-music-floating-bar">
+    <button id="float-audio-btn" onclick="toggleAudio()">▶ BGM: PLAY</button>
 </div>
 
 <canvas id="bg-canvas"></canvas>
@@ -516,6 +552,24 @@ display: none !important;
 
 <h2 style="color: rgb(228, 228, 228); margin-bottom: 25px;">THE TEAM</h2>
 <div id="team-hierarchy" class="team-hierarchy"></div>
+</div>
+
+<!-- Modal: Background Music Settings -->
+<div id="bg-music-modal">
+<div class="modal-content">
+<h3>BACKGROUND MUSIC SETTINGS</h3>
+
+<label>Audio URL (.mp3 / .ogg / .wav)</label>
+<input type="text" id="bg-music-url" placeholder="assets/bg-music.mp3 o kaya direct link">
+
+<label> O mag-upload ng Local Audio File</label>
+<input type="file" id="bg-music-file" accept="audio/*" onchange="handleLocalBgMusicUpload(this)">
+
+<div style="display: flex; gap: 8px; margin-top: 10px;">
+    <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBgMusicSettings()">SAVE MUSIC</button>
+    <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBgMusicModal()">CANCEL</button>
+</div>
+</div>
 </div>
 
 <!-- Modal: Customize Banner Style & Image -->
@@ -658,6 +712,7 @@ display: none !important;
 <img id="modal-img" src="" alt="Preview">
 </div>
 
+<!-- Global Background Audio Element -->
 <audio id="bg-audio" loop preload="auto"></audio>
 
 <script>
@@ -675,6 +730,8 @@ const defaultTeamMembers = [
 
 let teamMembers = JSON.parse(localStorage.getItem('cyberHub_teamMembers')) || defaultTeamMembers;
 let customTopBanner = localStorage.getItem('cyberHub_topBanner') || "";
+let globalBgMusic = localStorage.getItem('cyberHub_bgMusic') || "assets/bg-music.mp3";
+
 let bannerStyleConfig = JSON.parse(localStorage.getItem('cyberHub_bannerStyle')) || {
     height: "220",
     borderStyle: "dashed",
@@ -723,9 +780,95 @@ function saveToDatabase() {
     localStorage.setItem('cyberHub_memberPin', memberAccessPin);
     localStorage.setItem('cyberHub_bannerStyle', JSON.stringify(bannerStyleConfig));
     localStorage.setItem('cyberHub_memberBtnStyle', JSON.stringify(memberBtnStyleConfig));
+    localStorage.setItem('cyberHub_bgMusic', globalBgMusic);
     if (customTopBanner) {
         localStorage.setItem('cyberHub_topBanner', customTopBanner);
     }
+}
+
+// Background Music Handlers
+function initBgMusic() {
+    if (globalBgMusic) {
+        audio.src = globalBgMusic;
+    }
+    // Auto-play listener sa unang click sa screen dahil sa browser policies
+    document.body.addEventListener('click', function autoPlayOnce() {
+        if (audio.paused && audio.src) {
+            audio.play().then(() => updateAudioUI()).catch(() => {});
+        }
+        document.body.removeEventListener('click', autoPlayOnce);
+    }, { once: true });
+}
+
+function openBgMusicModal() {
+    if(!isAdminAuthorized) return;
+    document.getElementById('bg-music-url').value = globalBgMusic || '';
+    document.getElementById('bg-music-modal').style.display = 'flex';
+}
+
+function closeBgMusicModal() {
+    document.getElementById('bg-music-modal').style.display = 'none';
+}
+
+function handleLocalBgMusicUpload(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            globalBgMusic = e.target.result;
+            document.getElementById('bg-music-url').value = "[ Local File Loaded ]";
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function saveBgMusicSettings() {
+    if(!isAdminAuthorized) return;
+    const urlInput = document.getElementById('bg-music-url').value.trim();
+    
+    if (urlInput && urlInput !== "[ Local File Loaded ]") {
+        globalBgMusic = urlInput;
+    }
+
+    saveToDatabase();
+    audio.src = globalBgMusic;
+    audio.play().then(() => updateAudioUI()).catch(err => alert("Audio loaded, click anywhere to play."));
+    closeBgMusicModal();
+}
+
+function toggleAudio() {
+    if (!audio.src) {
+        alert("No audio track loaded.");
+        return;
+    }
+    if (audio.paused) {
+        audio.play().then(() => updateAudioUI()).catch(err => alert("Playback error."));
+    } else {
+        audio.pause();
+        updateAudioUI();
+    }
+}
+
+function updateAudioUI() {
+    const adminBtn = document.getElementById('admin-audio-toggle-btn');
+    const floatBtn = document.getElementById('float-audio-btn');
+    
+    if (audio.paused) {
+        if(adminBtn) adminBtn.textContent = "▶ PLAY AUDIO";
+        if(floatBtn) floatBtn.textContent = "▶ BGM: PAUSED";
+    } else {
+        if(adminBtn) adminBtn.textContent = "⏸ PAUSE AUDIO";
+        if(floatBtn) floatBtn.textContent = "⏸ BGM: PLAYING";
+    }
+}
+
+function playMemberMusic(musicUrl) {
+    if (!musicUrl) {
+        alert("No music assigned to this member.");
+        return;
+    }
+    audio.src = musicUrl;
+    audio.play().then(() => updateAudioUI()).catch(err => alert("Unable to play audio. Verify URL or file path."));
 }
 
 function applyMemberBtnStyles() {
@@ -897,8 +1040,10 @@ function resetDatabase() {
         localStorage.removeItem('cyberHub_memberPin');
         localStorage.removeItem('cyberHub_bannerStyle');
         localStorage.removeItem('cyberHub_memberBtnStyle');
+        localStorage.removeItem('cyberHub_bgMusic');
         teamMembers = [];
         customTopBanner = "";
+        globalBgMusic = "assets/bg-music.mp3";
         memberAccessPin = "1234";
         bannerStyleConfig = { height: "220", borderStyle: "dashed", borderColor: "#dc143c", glow: "15", fit: "cover" };
         memberBtnStyleConfig = { bg: "rgba(220, 20, 60, 0.1)", color: "#dc143c", borderColor: "#dc143c", hoverBg: "#dc143c", hoverColor: "#000000", borderStyle: "solid", radius: "4" };
@@ -907,6 +1052,7 @@ function resetDatabase() {
         applyBannerStyles();
         applyMemberBtnStyles();
         showBannerPlaceholder();
+        initBgMusic();
         if(document.getElementById('manager-modal').style.display === 'flex') {
             renderManagerLists();
         }
@@ -950,7 +1096,9 @@ function openMemberModal(index = -1) {
         document.getElementById('avatar-preview').src = "";
     }
 
-    document.getElementById('m-img-file').value = '';
+    const fileInput = document.getElementById('m-img-file');
+    if (fileInput) fileInput.value = '';
+    
     document.getElementById('member-modal').style.display = 'flex'; 
 }
 
@@ -1008,35 +1156,6 @@ function deleteMember(index) {
         if(document.getElementById('manager-modal').style.display === 'flex') {
             renderManagerLists();
         }
-    }
-}
-
-function playMemberMusic(musicUrl) {
-    if (!musicUrl) {
-        alert("No music assigned to this member.");
-        return;
-    }
-    audio.src = musicUrl;
-    audio.play().then(() => {
-        document.getElementById('audio-toggle-btn').textContent = "⏸ PAUSE AUDIO";
-    }).catch(err => {
-        alert("Unable to play audio. Verify the URL or file path.");
-    });
-}
-
-function toggleAudio() {
-    const btn = document.getElementById('audio-toggle-btn');
-    if (!audio.src) {
-        alert("No audio track loaded.");
-        return;
-    }
-    if (audio.paused) {
-        audio.play().then(() => {
-            btn.textContent = "⏸ PAUSE AUDIO";
-        }).catch(err => alert("Playback error."));
-    } else {
-        audio.pause();
-        btn.textContent = "▶ PLAY AUDIO";
     }
 }
 
@@ -1173,7 +1292,8 @@ setInterval(drawCanvas, 33);
 loadSavedBanner();
 applyMemberBtnStyles();
 renderTeam();
-checkAdminAccess(); // Sine-check kung admin ang pumasok
+initBgMusic();
+checkAdminAccess();
 </script>
 </body>
 </html>
