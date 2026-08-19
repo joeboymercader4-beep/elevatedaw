@@ -504,15 +504,6 @@ display: none !important;
 <input type="file" id="top-banner-input" accept="image/gif, image/png, image/jpeg, image/webp" style="display: none;" onchange="handleBannerUpload(this)">
 
 <!-- Top Image Banner Frame -->
-<div class="team-top-banner" id="banner-container">
-    <img id="top-banner-img" 
-         src="assets/elevate-banner.gif" 
-         alt="Top Banner GIF" 
-         onerror="handleBannerFallback(this)">
-    <span id="banner-placeholder-text" class="banner-placeholder" style="display:none;">[ TOP BLANK IMAGE SLOT ]</span>
-    <button class="banner-admin-btn" onclick="openBannerCustomizeModal()">✏ EDIT BANNER</button>
-</div>
-
 <!-- Modal: Customize Banner Style & Image -->
 <div id="banner-customize-modal">
     <div class="modal-content">
