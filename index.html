@@ -20,8 +20,6 @@ overflow-x: hidden;
 
 /* Welcome Entry Screen Overlay */
 #welcome-screen {
-font-family: helvetica;
-font-size: 1rem;
 position: fixed;
 top: 0; left: 0;
 width: 100vw; height: 100vh;
@@ -37,8 +35,6 @@ transition: opacity 0.5s ease, visibility 0.5s ease;
 
 .welcome-title {
 color: crimson;
-font-family: helvetica;
-font-size: 1rem;
 font-size: 2.5rem;
 font-weight: bold;
 letter-spacing: 4px;
@@ -273,8 +269,12 @@ background: crimson;
 box-shadow: 0 0 8px crimson;
 }
 
+/* MODIFIED: User Info Card Support for Background GIF */
 .team-card {
-background: rgba(10, 10, 10, 0.9);
+background: rgba(10, 10, 10, 0.85);
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
 border: 1px solid crimson;
 border-radius: 8px;
 padding: 15px;
@@ -285,6 +285,22 @@ align-items: center;
 box-shadow: 0 0 12px rgba(220, 20, 60, 0.3);
 position: relative;
 transition: all 0.3s ease;
+overflow: hidden;
+}
+
+/* Semi-transparent dark overlay inside card for readability */
+.team-card::before {
+content: '';
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background: rgba(10, 10, 10, 0.75);
+z-index: 1;
+border-radius: 7px;
+}
+
+.team-card > * {
+position: relative;
+z-index: 2;
 }
 
 .team-card:hover {
@@ -320,8 +336,8 @@ background: #111;
 cursor: pointer;
 }
 
-.team-name { font-weight: bold; font-size: 1rem; color: crimson; margin-bottom: 5px; }
-.team-role { font-size: 0.7rem; color: #888; margin-bottom: 12px; }
+.team-name { font-weight: bold; font-size: 1rem; color: crimson; margin-bottom: 5px; text-shadow: 0 0 5px #000; }
+.team-role { font-size: 0.7rem; color: #ccc; margin-bottom: 12px; text-shadow: 0 0 5px #000; }
 .team-actions { display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .team-socials { display: flex; justify-content: center; gap: 12px; margin-bottom: 4px; }
 
@@ -362,10 +378,11 @@ top: 6px;
 right: 8px;
 display: none;
 gap: 6px;
+z-index: 10;
 }
 
-.card-admin-btn { background: transparent; border: none; color: #888; font-size: 12px; cursor: pointer; }
-.card-admin-btn:hover { color: crimson; }
+.card-admin-btn { background: rgba(0,0,0,0.6); border: none; color: #fff; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
+.card-admin-btn:hover { color: crimson; background: #000; }
 
 /* Modals Setup */
 #member-modal, #img-modal, #manager-modal, #banner-customize-modal, #btn-customize-modal, #bg-music-modal {
@@ -391,6 +408,8 @@ flex-direction: column;
 gap: 10px;
 box-shadow: 0 0 25px rgba(220, 20, 60, 0.5);
 text-align: left;
+max-height: 90vh;
+overflow-y: auto;
 }
 
 .modal-content h3 { color: crimson; font-size: 0.9rem; text-align: center; }
@@ -419,6 +438,16 @@ display: block;
 background: #111;
 }
 
+.card-bg-preview-box {
+width: 100%;
+height: 60px;
+border: 1px solid crimson;
+object-fit: cover;
+border-radius: 4px;
+background: #111;
+display: block;
+}
+
 .manager-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .manager-item { display: flex; justify-content: space-between; align-items: center; background: #111; border: 1px solid #333; padding: 8px 10px; border-radius: 4px; font-size: 0.75rem; }
 .manager-item-info { display: flex; flex-direction: column; overflow: hidden; max-width: 55%; }
@@ -436,7 +465,7 @@ background: #111;
 
 <!-- Welcome Entry Overlay Screen -->
 <div id="welcome-screen">
-<div class="welcome-title">ELEVATE ANO TARA?</div>
+<div class="welcome-title">WELCOME TO ELEVATE</div>
 <button class="welcome-btn" onclick="enterWebsite()">ENTER WEBSITE</button>
 </div>
 
@@ -575,7 +604,13 @@ background: #111;
 <label>Profile Picture</label>
 <input type="file" id="m-img-file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="previewAvatar(this)">
 <img id="avatar-preview" class="avatar-preview-box" src="" alt="Avatar Preview">
-<label>Name</label>
+
+<label style="margin-top:5px; color:crimson; font-weight:bold;">User Info Card Background (GIF / Image)</label>
+<input type="file" id="m-card-bg-file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="previewCardBg(this)">
+<img id="card-bg-preview" class="card-bg-preview-box" src="" alt="Card BG Preview" style="display:none;">
+<button type="button" class="sm-btn" style="margin-top: 3px;" onclick="removeCardBg()">Clear Card GIF Background</button>
+
+<label style="margin-top:5px;">Name</label>
 <input type="text" id="m-name" placeholder="AKI">
 <label>Role</label>
 <input type="text" id="m-role" placeholder="Leader / player ">
@@ -610,7 +645,6 @@ background: #111;
 <script>
 
 // ==================== FIREBASE CONFIGURATION ====================
-// 
 const firebaseConfig = {
 apiKey : "AIzaSyBQLI9qPA7-bbO8jG4I13KnJ3ZDGrpONJc", 
 authDomain: "elevate-9cbb2.firebaseapp.com",
@@ -632,9 +666,10 @@ let isAdminAuthorized = false;
 
 const audio = document.getElementById('bg-audio');
 let currentAvatarBase64 = "";
+let currentCardBgBase64 = "";
 let editMemberIndex = -1;
 
-let teamMembers = [ { name: "AKI", role: "Leader / Founder", img: "assets/default-avatar.png", ig: "", fb: "" } ];
+let teamMembers = [ { name: "AKI", role: "Leader / Founder", img: "assets/default-avatar.png", cardBg: "", ig: "", fb: "" } ];
 let customTopBanner = "";
 let globalBgMusic = "assets/bg-music.mp3";
 
@@ -683,7 +718,6 @@ db.ref('cyberHubData').on('value', (snapshot) => {
     }
 });
 }
-
 
 function enterWebsite() {
 const welcomeScreen = document.getElementById('welcome-screen');
@@ -931,6 +965,28 @@ if (file) {
 }
 }
 
+function previewCardBg(input) {
+const file = input.files[0];
+if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentCardBgBase64 = e.target.result;
+        const bgPrev = document.getElementById('card-bg-preview');
+        bgPrev.src = currentCardBgBase64;
+        bgPrev.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+}
+
+function removeCardBg() {
+currentCardBgBase64 = "";
+document.getElementById('m-card-bg-file').value = "";
+const bgPrev = document.getElementById('card-bg-preview');
+bgPrev.src = "";
+bgPrev.style.display = 'none';
+}
+
 function openMemberModal(index = -1) { 
 if(!isAdminAuthorized) return;
 editMemberIndex = index;
@@ -944,6 +1000,16 @@ if (index >= 0 && index < teamMembers.length) {
     document.getElementById('m-fb').value = member.fb || '';
     currentAvatarBase64 = member.img || '';
     document.getElementById('avatar-preview').src = member.img || '';
+
+    currentCardBgBase64 = member.cardBg || '';
+    const bgPrev = document.getElementById('card-bg-preview');
+    if (currentCardBgBase64) {
+        bgPrev.src = currentCardBgBase64;
+        bgPrev.style.display = 'block';
+    } else {
+        bgPrev.src = '';
+        bgPrev.style.display = 'none';
+    }
 } else {
     document.getElementById('modal-title').textContent = "ADD CREW MEMBER";
     document.getElementById('m-name').value = '';
@@ -952,6 +1018,7 @@ if (index >= 0 && index < teamMembers.length) {
     document.getElementById('m-fb').value = '';
     currentAvatarBase64 = "";
     document.getElementById('avatar-preview').src = "";
+    removeCardBg();
 }
 document.getElementById('member-modal').style.display = 'flex'; 
 }
@@ -959,6 +1026,7 @@ document.getElementById('member-modal').style.display = 'flex';
 function closeMemberModal() { 
 document.getElementById('member-modal').style.display = 'none'; 
 currentAvatarBase64 = "";
+currentCardBgBase64 = "";
 editMemberIndex = -1;
 }
 
@@ -974,12 +1042,13 @@ if (!isAdminAuthorized) return;
 const name = document.getElementById('m-name').value.trim();
 const role = document.getElementById('m-role').value.trim() || 'Crew Member';
 const img = currentAvatarBase64 || 'assets/default-avatar.png';
+const cardBg = currentCardBgBase64 || '';
 const ig = document.getElementById('m-ig').value.trim();
 const fb = document.getElementById('m-fb').value.trim();
 
 if (!name) return alert("Please enter a name.");
 
-const memberData = { name, role, img, ig, fb };
+const memberData = { name, role, img, cardBg, ig, fb };
 
 if (editMemberIndex >= 0 && editMemberIndex < teamMembers.length) {
     teamMembers[editMemberIndex] = memberData;
@@ -1032,6 +1101,11 @@ tiers.forEach(tier => {
         const globalIndex = teamMembers.indexOf(member);
         const card = document.createElement('div');
         card.className = 'team-card';
+
+        // Set card background image/GIF dynamically if exists
+        if (member.cardBg) {
+            card.style.backgroundImage = `url('${member.cardBg}')`;
+        }
 
         let socialsHtml = '';
         if (member.ig || member.fb) {
@@ -1113,7 +1187,6 @@ setInterval(drawCanvas, 33);
 // Initialize Cloud Connection
 listenToCloud();
 checkAdminAccess();
-</script>
 </script>
 </body>
 </html>
