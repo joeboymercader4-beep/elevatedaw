@@ -4,128 +4,133 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ELEVATE</title>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { 
-background: #0a0a0a; 
-color: #e0e0e0; 
-font-family: 'Courier New', monospace; 
-overflow-x: hidden;
+  background: #0a0a0a; 
+  color: #e0e0e0; 
+  font-family: 'Courier New', monospace; 
+  overflow-x: hidden;
 }
 
 /* Welcome Entry Screen Overlay */
 #welcome-screen {
-position: fixed;
-top: 0; left: 0;
-width: 100vw; height: 100vh;
-background: #0a0a0a;
-z-index: 9999;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-gap: 20px;
-transition: opacity 0.5s ease, visibility 0.5s ease;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: #0a0a0a;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 .welcome-title {
-color: crimson;
-font-size: 2.5rem;
-font-weight: bold;
-letter-spacing: 4px;
-text-shadow: 0 0 15px crimson;
-text-align: center;
+  color: crimson;
+  font-size: 2.5rem;
+  font-weight: bold;
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px crimson;
+  text-align: center;
 }
 
 .welcome-btn {
-background: rgba(10, 10, 10, 0.9);
-border: 2px solid crimson;
-color: crimson;
-padding: 15px 35px;
-font-family: inherit;
-font-size: 1rem;
-font-weight: bold;
-letter-spacing: 2px;
-cursor: pointer;
-box-shadow: 0 0 15px rgba(220, 20, 60, 0.5);
-border-radius: 8px;
-transition: all 0.3s ease;
+  background: rgba(10, 10, 10, 0.9);
+  border: 2px solid crimson;
+  color: crimson;
+  padding: 15px 35px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(220, 20, 60, 0.5);
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .welcome-btn:hover {
-background: crimson;
-color: #000;
-box-shadow: 0 0 30px crimson;
-transform: scale(1.05);
+  background: crimson;
+  color: #000;
+  box-shadow: 0 0 30px crimson;
+  transform: scale(1.05);
 }
 
 #bg-canvas {
-position: fixed;
-top: 0; left: 0;
-width: 100vw; height: 100vh;
-z-index: 1;
-opacity: 0.35;
-pointer-events: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 1;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 /* Upper Right Admin Controls Dropdown */
 .admin-wrapper {
-position: fixed;
-top: 15px;
-right: 15px;
-z-index: 200;
-display: none;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 200;
+  display: none;
 }
 
 .admin-main-btn {
-background: rgba(10, 10, 10, 0.9);
-border: 1px solid crimson;
-color: crimson;
-padding: 8px 14px;
-font-family: inherit;
-font-size: 0.75rem;
-font-weight: bold;
-cursor: pointer;
-box-shadow: 0 0 12px rgba(220, 20, 60, 0.4);
-border-radius: 6px;
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid crimson;
+  color: crimson;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(220, 20, 60, 0.4);
+  border-radius: 6px;
 }
 
 .admin-main-btn:hover {
-background: crimson;
-color: #000;
+  background: crimson;
+  color: #000;
 }
 
 .admin-dropdown-menu {
-display: none;
-position: absolute;
-right: 0;
-top: 40px;
-background: rgba(10, 10, 10, 0.95);
-border: 1px solid crimson;
-border-radius: 6px;
-padding: 10px;
-width: 220px;
-flex-direction: column;
-gap: 8px;
-box-shadow: 0 0 20px rgba(220, 20, 60, 0.6);
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid crimson;
+  border-radius: 6px;
+  padding: 10px;
+  width: 220px;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.6);
 }
 
 .admin-dropdown-menu.active {
-display: flex;
+  display: flex;
 }
 
 .action-btn {
-background: rgba(10, 10, 10, 0.9);
-border: 1px solid crimson;
-color: crimson;
-padding: 8px 12px;
-font-family: inherit;
-font-size: 0.7rem;
-font-weight: bold;
-cursor: pointer;
-text-align: left;
-transition: all 0.2s ease;
-width: 100%;
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid crimson;
+  color: crimson;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
 .action-btn:hover { background: crimson; color: #0a0a0a; box-shadow: 0 0 10px crimson; }
@@ -134,398 +139,301 @@ width: 100%;
 
 /* Fixed Background Music Control Bar */
 .bg-music-floating-bar {
-position: fixed;
-bottom: 15px;
-left: 15px;
-z-index: 300;
-background: rgba(10, 10, 10, 0.85);
-border: 1px solid crimson;
-border-radius: 20px;
-padding: 6px 14px;
-display: flex;
-align-items: center;
-gap: 10px;
-box-shadow: 0 0 12px rgba(220, 20, 60, 0.4);
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  z-index: 300;
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid crimson;
+  border-radius: 20px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 0 12px rgba(220, 20, 60, 0.4);
 }
 
 .bg-music-floating-bar button {
-background: transparent;
-border: none;
-color: crimson;
-font-family: inherit;
-font-size: 0.75rem;
-font-weight: bold;
-cursor: pointer;
+  background: transparent;
+  border: none;
+  color: crimson;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-.bg-music-floating-bar button:hover {
-color: #fff;
-}
+.bg-music-floating-bar button:hover { color: #fff; }
 
 /* Main Page Container */
 .page-section {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: flex-start;
-min-height: 100vh;
-width: 100vw;
-text-align: center;
-z-index: 20;
-position: relative;
-padding: 40px 15px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  width: 100vw;
+  text-align: center;
+  z-index: 20;
+  position: relative;
+  padding: 40px 15px 40px;
 }
 
 /* Dynamic Customizable Banner Framing */
 .team-top-banner {
-width: 95%;
-max-width: 850px;
-height: 220px;
-border: 1.5px dashed crimson;
-border-radius: 8px;
-background: rgba(10, 10, 10, 0.85);
-box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
-margin-bottom: 35px;
-overflow: hidden;
-display: flex;
-justify-content: center;
-align-items: center;
-position: relative;
-transition: all 0.3s ease;
+  width: 95%;
+  max-width: 850px;
+  height: 220px;
+  border: 1.5px dashed crimson;
+  border-radius: 8px;
+  background: rgba(10, 10, 10, 0.85);
+  box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
+  margin-bottom: 35px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .team-top-banner img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-object-position: center;
-display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .banner-placeholder {
-color: crimson;
-font-size: 0.8rem;
-font-weight: bold;
-letter-spacing: 1px;
-padding: 20px;
+  color: crimson;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 20px;
 }
 
 .banner-admin-btn {
-position: absolute;
-bottom: 10px;
-right: 10px;
-background: rgba(10, 10, 10, 0.85);
-border: 1px solid crimson;
-color: crimson;
-font-family: inherit;
-font-size: 0.65rem;
-font-weight: bold;
-padding: 5px 10px;
-border-radius: 4px;
-cursor: pointer;
-display: none;
-z-index: 30;
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-transition: all 0.2s ease;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid crimson;
+  color: crimson;
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: none;
+  z-index: 30;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  transition: all 0.2s ease;
 }
 
-.banner-admin-btn:hover {
-background: crimson;
-color: #000;
-}
-
+.banner-admin-btn:hover { background: crimson; color: #000; }
 body.is-admin .banner-admin-btn { display: block !important; }
 body.is-admin .card-admin-controls { display: flex !important; }
 
 /* Hierarchical Tree Container */
 .team-hierarchy {
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 35px;
-width: 95%;
-max-width: 950px;
-position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 35px;
+  width: 95%;
+  max-width: 950px;
+  position: relative;
 }
 
 .hierarchy-tier {
-display: flex;
-justify-content: center;
-align-items: center;
-gap: 25px;
-flex-wrap: wrap;
-width: 100%;
-position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  flex-wrap: wrap;
+  width: 100%;
+  position: relative;
 }
 
 .hierarchy-tier:not(:last-child)::after {
-content: '';
-position: absolute;
-bottom: -22px;
-left: 50%;
-transform: translateX(-50%);
-width: 2px;
-height: 20px;
-background: crimson;
-box-shadow: 0 0 8px crimson;
+  content: '';
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 20px;
+  background: crimson;
+  box-shadow: 0 0 8px crimson;
 }
 
 .team-card {
-background: rgba(10, 10, 10, 0.9);
-border: 1px solid crimson;
-border-radius: 8px;
-padding: 15px;
-width: 220px;
-display: flex;
-flex-direction: column;
-align-items: center;
-box-shadow: 0 0 12px rgba(220, 20, 60, 0.3);
-position: relative;
-transition: all 0.3s ease;
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid crimson;
+  border-radius: 8px;
+  padding: 15px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 0 12px rgba(220, 20, 60, 0.3);
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .team-card:hover {
-transform: translateY(-4px);
-box-shadow: 0 0 20px rgba(220, 20, 60, 0.7);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.7);
 }
 
 .hierarchy-tier[data-tier="1"] .team-card {
-border-width: 2px;
-box-shadow: 0 0 18px rgba(220, 20, 60, 0.6);
-transform: scale(1.05);
+  border-width: 2px;
+  box-shadow: 0 0 18px rgba(220, 20, 60, 0.6);
+  transform: scale(1.05);
 }
 
 .hierarchy-tier[data-tier="1"] .team-card:hover {
-transform: scale(1.08) translateY(-4px);
+  transform: scale(1.08) translateY(-4px);
 }
 
 .hierarchy-tier[data-tier="1"] .team-avatar {
-width: 95px;
-height: 95px;
+  width: 95px;
+  height: 95px;
 }
 
 .team-avatar {
-width: 80px;
-height: 80px;
-border-radius: 50%;
-border: 2px solid crimson;
-object-fit: cover;
-object-position: center;
-margin-bottom: 10px;
-box-shadow: 0 0 10px crimson;
-background: #111;
-cursor: pointer;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid crimson;
+  object-fit: cover;
+  object-position: center;
+  margin-bottom: 10px;
+  box-shadow: 0 0 10px crimson;
+  background: #111;
+  cursor: pointer;
 }
 
-.team-name {
-font-weight: bold;
-font-size: 1rem;
-color: crimson;
-margin-bottom: 5px;
-}
-
-.team-role {
-font-size: 0.7rem;
-color: #888;
-margin-bottom: 12px;
-}
-
-.team-actions {
-display: flex;
-flex-direction: column;
-gap: 6px;
-width: 100%;
-}
-
-.team-socials {
-display: flex;
-justify-content: center;
-gap: 12px;
-margin-bottom: 4px;
-}
+.team-name { font-weight: bold; font-size: 1rem; color: crimson; margin-bottom: 5px; }
+.team-role { font-size: 0.7rem; color: #888; margin-bottom: 12px; }
+.team-actions { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.team-socials { display: flex; justify-content: center; gap: 12px; margin-bottom: 4px; }
 
 .social-icon-btn {
-width: 36px;
-height: 36px;
-border-radius: var(--m-btn-radius, 50%);
-border-width: 1px;
-border-style: var(--m-btn-border-style, solid);
-border-color: var(--m-btn-border-color, crimson);
-background: var(--m-btn-bg, rgba(220, 20, 60, 0.1));
-display: flex;
-align-items: center;
-justify-content: center;
-transition: all 0.2s ease;
-text-decoration: none;
-box-shadow: 0 0 6px rgba(220, 20, 60, 0.3);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--m-btn-radius, 50%);
+  border-width: 1px;
+  border-style: var(--m-btn-border-style, solid);
+  border-color: var(--m-btn-border-color, crimson);
+  background: var(--m-btn-bg, rgba(220, 20, 60, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 0 6px rgba(220, 20, 60, 0.3);
 }
 
 .social-icon-btn svg {
-width: 18px;
-height: 18px;
-fill: var(--m-btn-color, crimson);
-transition: fill 0.2s ease;
+  width: 18px;
+  height: 18px;
+  fill: var(--m-btn-color, crimson);
+  transition: fill 0.2s ease;
 }
 
 .social-icon-btn:hover {
-background: var(--m-btn-hover-bg, crimson);
-box-shadow: 0 0 12px var(--m-btn-hover-bg, crimson);
-transform: scale(1.1);
+  background: var(--m-btn-hover-bg, crimson);
+  box-shadow: 0 0 12px var(--m-btn-hover-bg, crimson);
+  transform: scale(1.1);
 }
 
 .social-icon-btn:hover svg { fill: var(--m-btn-hover-color, #000); }
 
 .card-admin-controls {
-position: absolute;
-top: 6px;
-right: 8px;
-display: none;
-gap: 6px;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: none;
+  gap: 6px;
 }
 
-.card-admin-btn {
-background: transparent;
-border: none;
-color: #888;
-font-size: 12px;
-cursor: pointer;
-}
-
+.card-admin-btn { background: transparent; border: none; color: #888; font-size: 12px; cursor: pointer; }
 .card-admin-btn:hover { color: crimson; }
 
 /* Modals Setup */
 #member-modal, #img-modal, #manager-modal, #banner-customize-modal, #btn-customize-modal, #bg-music-modal {
-position: fixed;
-top: 0; left: 0;
-width: 100vw; height: 100vh;
-background: rgba(0, 0, 0, 0.85);
-z-index: 1000;
-display: none;
-justify-content: center;
-align-items: center;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-content {
-background: rgba(10, 10, 10, 0.95);
-border: 1px solid crimson;
-border-radius: 8px;
-padding: 20px;
-width: 90%;
-max-width: 450px;
-display: flex;
-flex-direction: column;
-gap: 10px;
-box-shadow: 0 0 25px rgba(220, 20, 60, 0.5);
-text-align: left;
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid crimson;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 0 25px rgba(220, 20, 60, 0.5);
+  text-align: left;
 }
 
 .modal-content h3 { color: crimson; font-size: 0.9rem; text-align: center; }
 .modal-content label { font-size: 0.65rem; color: #aaa; }
 .modal-content input[type="text"], .modal-content input[type="file"], .modal-content select {
-width: 100%;
-background: #111;
-border: 1px solid #444;
-color: #fff;
-padding: 6px;
-font-family: inherit;
-font-size: 0.7rem;
-border-radius: 4px;
+  width: 100%;
+  background: #111;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 6px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  border-radius: 4px;
 }
 
-.color-input-group {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-
-.color-input-group input[type="color"] {
-background: transparent;
-border: 1px solid #444;
-width: 40px;
-height: 28px;
-cursor: pointer;
-border-radius: 4px;
-}
+.color-input-group { display: flex; align-items: center; gap: 10px; }
+.color-input-group input[type="color"] { background: transparent; border: 1px solid #444; width: 40px; height: 28px; cursor: pointer; border-radius: 4px; }
 
 .avatar-preview-box {
-width: 60px;
-height: 60px;
-border-radius: 50%;
-border: 1px solid crimson;
-object-fit: cover;
-margin: 0 auto;
-display: block;
-background: #111;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 1px solid crimson;
+  object-fit: cover;
+  margin: 0 auto;
+  display: block;
+  background: #111;
 }
 
-.manager-list {
-max-height: 200px;
-overflow-y: auto;
-display: flex;
-flex-direction: column;
-gap: 8px;
-margin-top: 10px;
-}
-
-.manager-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-background: #111;
-border: 1px solid #333;
-padding: 8px 10px;
-border-radius: 4px;
-font-size: 0.75rem;
-}
-
-.manager-item-info {
-display: flex;
-flex-direction: column;
-overflow: hidden;
-max-width: 55%;
-}
-
-.manager-item-title {
-color: crimson;
-font-weight: bold;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-}
-
+.manager-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.manager-item { display: flex; justify-content: space-between; align-items: center; background: #111; border: 1px solid #333; padding: 8px 10px; border-radius: 4px; font-size: 0.75rem; }
+.manager-item-info { display: flex; flex-direction: column; overflow: hidden; max-width: 55%; }
+.manager-item-title { color: crimson; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .manager-item-sub { color: #888; font-size: 0.65rem; }
-
 .manager-item-actions { display: flex; gap: 4px; }
 
-.sm-btn {
-padding: 4px 8px;
-font-size: 0.65rem;
-font-family: inherit;
-border: 1px solid crimson;
-background: transparent;
-color: crimson;
-cursor: pointer;
-border-radius: 3px;
-}
-
+.sm-btn { padding: 4px 8px; font-size: 0.65rem; font-family: inherit; border: 1px solid crimson; background: transparent; color: crimson; cursor: pointer; border-radius: 3px; }
 .sm-btn:hover { background: crimson; color: #000; }
 
-#img-modal img {
-max-width: 85%;
-max-height: 85%;
-border: 2px solid crimson;
-box-shadow: 0 0 25px crimson;
-border-radius: 6px;
-object-fit: contain;
-}
+#img-modal img { max-width: 85%; max-height: 85%; border: 2px solid crimson; box-shadow: 0 0 25px crimson; border-radius: 6px; object-fit: contain; }
 </style>
 </head>
 <body>
 
 <!-- Welcome Entry Overlay Screen -->
 <div id="welcome-screen">
-    <div class="welcome-title">ELEVATE!!!!</div>
-    <button class="welcome-btn" onclick="enterWebsite()">PINDOT MUNA</button>
+    <div class="welcome-title">WELCOME TO ELEVATE</div>
+    <button class="welcome-btn" onclick="enterWebsite()">ENTER WEBSITE</button>
 </div>
 
 <!-- Admin Dropdown Menu -->
@@ -552,15 +460,11 @@ object-fit: contain;
 
 <canvas id="bg-canvas"></canvas>
 
-<!-- Hidden File Input for Top Banner Upload -->
 <input type="file" id="top-banner-input" accept="image/gif, image/png, image/jpeg, image/webp" style="display: none;" onchange="handleBannerUpload(this)">
 
 <div class="page-section">
 <div class="team-top-banner" id="banner-container">
-    <img id="top-banner-img" 
-            src="assets/elevate-banner.gif" 
-            alt="Top Banner GIF" 
-            onerror="handleBannerFallback(this)">
+    <img id="top-banner-img" src="assets/elevate-banner.gif" alt="Top Banner GIF" onerror="handleBannerFallback(this)">
     <span id="banner-placeholder-text" class="banner-placeholder" style="display:none;">[ TOP BLANK IMAGE SLOT ]</span>
     <button class="banner-admin-btn" onclick="openBannerCustomizeModal()">✏ EDIT BANNER</button>
 </div>
@@ -569,17 +473,14 @@ object-fit: contain;
 <div id="team-hierarchy" class="team-hierarchy"></div>
 </div>
 
-<!-- Modal: Background Music Settings -->
+<!-- Modals -->
 <div id="bg-music-modal">
 <div class="modal-content">
 <h3>BACKGROUND MUSIC SETTINGS</h3>
-
 <label>Audio URL (.mp3 / .ogg / .wav)</label>
 <input type="text" id="bg-music-url" placeholder="assets/bg-music.mp3 o direct audio link">
-
 <label>O mag-upload ng Local Audio File</label>
 <input type="file" id="bg-music-file" accept="audio/*" onchange="handleLocalBgMusicUpload(this)">
-
 <div style="display: flex; gap: 8px; margin-top: 10px;">
     <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBgMusicSettings()">SAVE MUSIC</button>
     <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBgMusicModal()">CANCEL</button>
@@ -587,17 +488,13 @@ object-fit: contain;
 </div>
 </div>
 
-<!-- Modal: Customize Banner -->
 <div id="banner-customize-modal">
 <div class="modal-content">
 <h3>CUSTOMIZE BANNER</h3>
-
 <label>Upload New Banner Image / GIF</label>
 <input type="file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="handleBannerUpload(this)">
-
 <label>Banner Height (px)</label>
 <input type="text" id="b-height" placeholder="e.g. 220">
-
 <label>Border Style</label>
 <select id="b-border-style">
     <option value="dashed">Dashed</option>
@@ -605,22 +502,18 @@ object-fit: contain;
     <option value="double">Double</option>
     <option value="dotted">Dotted</option>
 </select>
-
 <label>Border & Glow Color</label>
 <div class="color-input-group">
     <input type="color" id="b-color-picker" value="#dc143c" onchange="document.getElementById('b-color-text').value = this.value">
     <input type="text" id="b-color-text" placeholder="#dc143c" style="flex:1;">
 </div>
-
 <label>Glow Shadow Intensity (px)</label>
 <input type="text" id="b-glow" placeholder="e.g. 15">
-
 <label>Image Fit Style</label>
 <select id="b-fit">
     <option value="cover">Cover (Full Bleed)</option>
     <option value="contain">Contain (Fit Whole Image)</option>
 </select>
-
 <div style="display: flex; gap: 8px; margin-top: 10px;">
     <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBannerCustomizations()">SAVE</button>
     <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBannerCustomizeModal()">CANCEL</button>
@@ -628,41 +521,34 @@ object-fit: contain;
 </div>
 </div>
 
-<!-- Modal: Customize Member Card Buttons -->
 <div id="btn-customize-modal">
 <div class="modal-content">
 <h3>CUSTOMIZE MEMBER BUTTONS</h3>
-
 <label>Background Color</label>
 <div class="color-input-group">
     <input type="color" id="mb-bg-picker" value="#dc143c" onchange="document.getElementById('mb-bg-text').value = this.value">
     <input type="text" id="mb-bg-text" placeholder="rgba(220, 20, 60, 0.1)" style="flex:1;">
 </div>
-
 <label>Text / Icon Color</label>
 <div class="color-input-group">
     <input type="color" id="mb-text-picker" value="#dc143c" onchange="document.getElementById('mb-text-text').value = this.value">
     <input type="text" id="mb-text-text" placeholder="#dc143c" style="flex:1;">
 </div>
-
 <label>Border Color</label>
 <div class="color-input-group">
     <input type="color" id="mb-border-picker" value="#dc143c" onchange="document.getElementById('mb-border-text').value = this.value">
     <input type="text" id="mb-border-text" placeholder="#dc143c" style="flex:1;">
 </div>
-
 <label>Hover Background Color</label>
 <div class="color-input-group">
     <input type="color" id="mb-hbg-picker" value="#dc143c" onchange="document.getElementById('mb-hbg-text').value = this.value">
     <input type="text" id="mb-hbg-text" placeholder="#dc143c" style="flex:1;">
 </div>
-
 <label>Hover Text Color</label>
 <div class="color-input-group">
     <input type="color" id="mb-htext-picker" value="#000000" onchange="document.getElementById('mb-htext-text').value = this.value">
     <input type="text" id="mb-htext-text" placeholder="#000000" style="flex:1;">
 </div>
-
 <label>Border Style</label>
 <select id="mb-border-style">
     <option value="solid">Solid</option>
@@ -670,10 +556,8 @@ object-fit: contain;
     <option value="double">Double</option>
     <option value="dotted">Dotted</option>
 </select>
-
 <label>Border Radius (px)</label>
 <input type="text" id="mb-radius" placeholder="e.g. 4">
-
 <div style="display: flex; gap: 8px; margin-top: 10px;">
     <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBtnCustomizations()">SAVE</button>
     <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBtnCustomizeModal()">CANCEL</button>
@@ -681,15 +565,12 @@ object-fit: contain;
 </div>
 </div>
 
-<!-- Modal Form: Add / Edit Member -->
 <div id="member-modal">
 <div class="modal-content">
 <h3 id="modal-title">ADD CREW MEMBER</h3>
-
-<label>Profile Picture (Choose Local File to Replace)</label>
+<label>Profile Picture</label>
 <input type="file" id="m-img-file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="previewAvatar(this)">
 <img id="avatar-preview" class="avatar-preview-box" src="" alt="Avatar Preview">
-
 <label>Name</label>
 <input type="text" id="m-name" placeholder="AKI">
 <label>Role</label>
@@ -698,7 +579,6 @@ object-fit: contain;
 <input type="text" id="m-ig" placeholder="https://instagram.com/yourusername">
 <label>Facebook Profile URL</label>
 <input type="text" id="m-fb" placeholder="https://facebook.com/yourprofile">
-
 <div style="display: flex; gap: 8px; margin-top: 10px;">
 <button class="action-btn" style="flex:1; text-align:center;" onclick="saveMember()">SAVE</button>
 <button class="action-btn" style="flex:1; text-align:center;" onclick="closeMemberModal()">CANCEL</button>
@@ -706,123 +586,130 @@ object-fit: contain;
 </div>
 </div>
 
-<!-- Modal: Data Manager -->
 <div id="manager-modal">
 <div class="modal-content">
 <h3>MANAGE DATA ENTRIES</h3>
-
 <label style="color: crimson; font-weight: bold; margin-top: 5px;">TEAM MEMBERS</label>
 <div id="manager-team-list" class="manager-list"></div>
-
 <div style="display: flex; gap: 8px; margin-top: 15px;">
 <button class="action-btn" style="flex:1; text-align:center;" onclick="closeManagerModal()">CLOSE</button>
 </div>
 </div>
 </div>
 
-<!-- Modal: Image Preview -->
 <div id="img-modal" onclick="closeImgModal()">
 <img id="modal-img" src="" alt="Preview">
 </div>
 
-<!-- Global Background Audio Element -->
 <audio id="bg-audio" loop preload="auto"></audio>
 
 <script>
+// ==================== FIREBASE CONFIGURATION ====================
+// PALITAN ANG MGA VALUES SA IBABA MULA SA FIREBASE CONSOLE MO:
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase Realtime Database
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+// ================================================================
+
 const ADMIN_PIN = "080205";
-let memberAccessPin = localStorage.getItem('cyberHub_memberPin') || "1234"; 
+let memberAccessPin = "1234"; 
 let isAdminAuthorized = false;
 
 const audio = document.getElementById('bg-audio');
 let currentAvatarBase64 = "";
 let editMemberIndex = -1;
 
-const defaultTeamMembers = [
-    { name: "AKI", role: "Leader / Founder", img: "assets/default-avatar.png", ig: "", fb: "" }
-];
+let teamMembers = [ { name: "AKI", role: "Leader / Founder", img: "assets/default-avatar.png", ig: "", fb: "" } ];
+let customTopBanner = "";
+let globalBgMusic = "assets/bg-music.mp3";
 
-let teamMembers = JSON.parse(localStorage.getItem('cyberHub_teamMembers')) || defaultTeamMembers;
-let customTopBanner = localStorage.getItem('cyberHub_topBanner') || "";
-let globalBgMusic = localStorage.getItem('cyberHub_bgMusic') || "assets/bg-music.mp3";
-
-let bannerStyleConfig = JSON.parse(localStorage.getItem('cyberHub_bannerStyle')) || {
-    height: "220",
-    borderStyle: "dashed",
-    borderColor: "#dc143c",
-    glow: "15",
-    fit: "cover"
-};
-
-let memberBtnStyleConfig = JSON.parse(localStorage.getItem('cyberHub_memberBtnStyle')) || {
-    bg: "rgba(220, 20, 60, 0.1)",
-    color: "#dc143c",
-    borderColor: "#dc143c",
-    hoverBg: "#dc143c",
-    hoverColor: "#000000",
-    borderStyle: "solid",
-    radius: "4"
-};
+let bannerStyleConfig = { height: "220", borderStyle: "dashed", borderColor: "#dc143c", glow: "15", fit: "cover" };
+let memberBtnStyleConfig = { bg: "rgba(220, 20, 60, 0.1)", color: "#dc143c", borderColor: "#dc143c", hoverBg: "#dc143c", hoverColor: "#000000", borderStyle: "solid", radius: "4" };
 
 const igIcon = `<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`;
 const fbIcon = `<svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>`;
 
-/* Enter Button Handler - Starts Music instantly on Click */
+// === CLOUD SAVE FUNCTION ===
+function saveToDatabase() {
+    const fullPayload = {
+        teamMembers,
+        memberAccessPin,
+        bannerStyleConfig,
+        memberBtnStyleConfig,
+        globalBgMusic,
+        customTopBanner
+    };
+    db.ref('cyberHubData').set(fullPayload);
+}
+
+// === REALTIME LISTEN FROM CLOUD (PC & MOBILE AUTO SYNC) ===
+function listenToCloud() {
+    db.ref('cyberHubData').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            if (data.teamMembers) teamMembers = data.teamMembers;
+            if (data.memberAccessPin) memberAccessPin = data.memberAccessPin;
+            if (data.bannerStyleConfig) bannerStyleConfig = data.bannerStyleConfig;
+            if (data.memberBtnStyleConfig) memberBtnStyleConfig = data.memberBtnStyleConfig;
+            if (data.globalBgMusic) globalBgMusic = data.globalBgMusic;
+            if (data.customTopBanner !== undefined) customTopBanner = data.customTopBanner;
+
+            renderTeam();
+            loadSavedBanner();
+            applyMemberBtnStyles();
+
+            if (audio.src !== globalBgMusic) {
+                audio.src = globalBgMusic;
+            }
+
+            if (document.getElementById('manager-modal').style.display === 'flex') {
+                renderManagerLists();
+            }
+        }
+    });
+}
+
 function enterWebsite() {
     const welcomeScreen = document.getElementById('welcome-screen');
     welcomeScreen.style.opacity = '0';
     welcomeScreen.style.visibility = 'hidden';
     
-    // Play Background Audio
     if (globalBgMusic) {
         audio.src = globalBgMusic;
         audio.volume = 0.5;
-        audio.play().then(() => {
-            updateAudioUI();
-        }).catch(err => {
-            console.log("Audio play deferred:", err);
-        });
+        audio.play().then(() => updateAudioUI()).catch(err => console.log("Audio deferred:", err));
     }
 }
 
 function checkAdminAccess() {
     const urlParams = new URLSearchParams(window.location.search);
-    const adminParam = urlParams.get('admin');
-
-    if (adminParam === "true" || adminParam === ADMIN_PIN) {
+    if (urlParams.get('admin') === "true" || urlParams.get('admin') === ADMIN_PIN) {
         showAdminPanel();
     }
 }
 
 window.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
-        showAdminPanel();
-    }
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') showAdminPanel();
 });
 
-function showAdminPanel() {
-    document.getElementById('admin-menu-wrapper').style.display = 'block';
-}
-
-function saveToDatabase() {
-    localStorage.setItem('cyberHub_teamMembers', JSON.stringify(teamMembers));
-    localStorage.setItem('cyberHub_memberPin', memberAccessPin);
-    localStorage.setItem('cyberHub_bannerStyle', JSON.stringify(bannerStyleConfig));
-    localStorage.setItem('cyberHub_memberBtnStyle', JSON.stringify(memberBtnStyleConfig));
-    localStorage.setItem('cyberHub_bgMusic', globalBgMusic);
-    if (customTopBanner) {
-        localStorage.setItem('cyberHub_topBanner', customTopBanner);
-    }
-}
+function showAdminPanel() { document.getElementById('admin-menu-wrapper').style.display = 'block'; }
 
 function openBgMusicModal() {
     if(!isAdminAuthorized) return;
     document.getElementById('bg-music-url').value = globalBgMusic || '';
     document.getElementById('bg-music-modal').style.display = 'flex';
 }
-
-function closeBgMusicModal() {
-    document.getElementById('bg-music-modal').style.display = 'none';
-}
+function closeBgMusicModal() { document.getElementById('bg-music-modal').style.display = 'none'; }
 
 function handleLocalBgMusicUpload(input) {
     const file = input.files[0];
@@ -839,24 +726,17 @@ function handleLocalBgMusicUpload(input) {
 function saveBgMusicSettings() {
     if(!isAdminAuthorized) return;
     const urlInput = document.getElementById('bg-music-url').value.trim();
-    
-    if (urlInput && urlInput !== "[ Local File Loaded ]") {
-        globalBgMusic = urlInput;
-    }
-
+    if (urlInput && urlInput !== "[ Local File Loaded ]") globalBgMusic = urlInput;
     saveToDatabase();
     audio.src = globalBgMusic;
-    audio.play().then(() => updateAudioUI()).catch(err => alert("Audio loaded, click play."));
+    audio.play().then(() => updateAudioUI()).catch(err => alert("Audio loaded."));
     closeBgMusicModal();
 }
 
 function toggleAudio() {
-    if (!audio.src) {
-        alert("No audio track loaded.");
-        return;
-    }
+    if (!audio.src) return alert("No audio track loaded.");
     if (audio.paused) {
-        audio.play().then(() => updateAudioUI()).catch(err => alert("Playback error."));
+        audio.play().then(() => updateAudioUI());
     } else {
         audio.pause();
         updateAudioUI();
@@ -866,7 +746,6 @@ function toggleAudio() {
 function updateAudioUI() {
     const adminBtn = document.getElementById('admin-audio-toggle-btn');
     const floatBtn = document.getElementById('float-audio-btn');
-    
     if (audio.paused) {
         if(adminBtn) adminBtn.textContent = "▶ PLAY AUDIO";
         if(floatBtn) floatBtn.textContent = "▶ BGM: PAUSED";
@@ -891,7 +770,6 @@ function applyMemberBtnStyles() {
 function applyBannerStyles() {
     const container = document.getElementById('banner-container');
     const img = document.getElementById('top-banner-img');
-
     if (bannerStyleConfig) {
         container.style.height = `${bannerStyleConfig.height || 220}px`;
         container.style.borderStyle = bannerStyleConfig.borderStyle || 'dashed';
@@ -906,9 +784,7 @@ function showBannerPlaceholder() {
     document.getElementById('banner-placeholder-text').style.display = 'block';
 }
 
-function handleBannerFallback(imgElement) {
-    showBannerPlaceholder();
-}
+function handleBannerFallback() { showBannerPlaceholder(); }
 
 function loadSavedBanner() {
     applyBannerStyles();
@@ -928,7 +804,6 @@ function handleBannerUpload(input) {
         reader.onload = function(e) {
             customTopBanner = e.target.result;
             saveToDatabase();
-            loadSavedBanner();
             input.value = "";
         };
         reader.readAsDataURL(file);
@@ -946,13 +821,10 @@ function openBannerCustomizeModal() {
     document.getElementById('banner-customize-modal').style.display = 'flex';
 }
 
-function closeBannerCustomizeModal() {
-    document.getElementById('banner-customize-modal').style.display = 'none';
-}
+function closeBannerCustomizeModal() { document.getElementById('banner-customize-modal').style.display = 'none'; }
 
 function saveBannerCustomizations() {
     if (!isAdminAuthorized) return;
-
     bannerStyleConfig = {
         height: document.getElementById('b-height').value.trim() || "220",
         borderStyle: document.getElementById('b-border-style').value,
@@ -960,9 +832,7 @@ function saveBannerCustomizations() {
         glow: document.getElementById('b-glow').value.trim() || "15",
         fit: document.getElementById('b-fit').value
     };
-
     saveToDatabase();
-    applyBannerStyles();
     closeBannerCustomizeModal();
 }
 
@@ -975,17 +845,13 @@ function openBtnCustomizeModal() {
     document.getElementById('mb-htext-text').value = memberBtnStyleConfig.hoverColor || "#000000";
     document.getElementById('mb-border-style').value = memberBtnStyleConfig.borderStyle || "solid";
     document.getElementById('mb-radius').value = memberBtnStyleConfig.radius || "4";
-
     document.getElementById('btn-customize-modal').style.display = 'flex';
 }
 
-function closeBtnCustomizeModal() {
-    document.getElementById('btn-customize-modal').style.display = 'none';
-}
+function closeBtnCustomizeModal() { document.getElementById('btn-customize-modal').style.display = 'none'; }
 
 function saveBtnCustomizations() {
     if (!isAdminAuthorized) return;
-
     memberBtnStyleConfig = {
         bg: document.getElementById('mb-bg-text').value.trim() || "rgba(220, 20, 60, 0.1)",
         color: document.getElementById('mb-text-text').value.trim() || "#dc143c",
@@ -995,15 +861,12 @@ function saveBtnCustomizations() {
         borderStyle: document.getElementById('mb-border-style').value,
         radius: document.getElementById('mb-radius').value.trim() || "4"
     };
-
     saveToDatabase();
-    applyMemberBtnStyles();
     closeBtnCustomizeModal();
 }
 
 function toggleAdminMenu() {
     const dropdown = document.getElementById('admin-dropdown');
-
     if (!isAdminAuthorized) {
         const pinInput = prompt("ENTER ADMIN SECURITY PIN:");
         if (pinInput === ADMIN_PIN) {
@@ -1025,7 +888,7 @@ function setMemberPin() {
     if (newPin !== null && newPin.trim() !== "") {
         memberAccessPin = newPin.trim();
         saveToDatabase();
-        alert("Member Access PIN updated successfully!");
+        alert("Member Access PIN updated!");
     }
 }
 
@@ -1039,13 +902,7 @@ function logoutAdmin() {
 
 function resetDatabase() {
     if (!isAdminAuthorized) return;
-    if (confirm("Are you sure you want to reset all stored data?")) {
-        localStorage.removeItem('cyberHub_teamMembers');
-        localStorage.removeItem('cyberHub_topBanner');
-        localStorage.removeItem('cyberHub_memberPin');
-        localStorage.removeItem('cyberHub_bannerStyle');
-        localStorage.removeItem('cyberHub_memberBtnStyle');
-        localStorage.removeItem('cyberHub_bgMusic');
+    if (confirm("Reset ALL stored cloud data?")) {
         teamMembers = [];
         customTopBanner = "";
         globalBgMusic = "assets/bg-music.mp3";
@@ -1053,13 +910,6 @@ function resetDatabase() {
         bannerStyleConfig = { height: "220", borderStyle: "dashed", borderColor: "#dc143c", glow: "15", fit: "cover" };
         memberBtnStyleConfig = { bg: "rgba(220, 20, 60, 0.1)", color: "#dc143c", borderColor: "#dc143c", hoverBg: "#dc143c", hoverColor: "#000000", borderStyle: "solid", radius: "4" };
         saveToDatabase();
-        renderTeam();
-        applyBannerStyles();
-        applyMemberBtnStyles();
-        showBannerPlaceholder();
-        if(document.getElementById('manager-modal').style.display === 'flex') {
-            renderManagerLists();
-        }
     }
 }
 
@@ -1097,10 +947,6 @@ function openMemberModal(index = -1) {
         currentAvatarBase64 = "";
         document.getElementById('avatar-preview').src = "";
     }
-
-    const fileInput = document.getElementById('m-img-file');
-    if (fileInput) fileInput.value = '';
-    
     document.getElementById('member-modal').style.display = 'flex'; 
 }
 
@@ -1108,7 +954,6 @@ function closeMemberModal() {
     document.getElementById('member-modal').style.display = 'none'; 
     currentAvatarBase64 = "";
     editMemberIndex = -1;
-    document.getElementById('avatar-preview').src = "";
 }
 
 function openManagerModal() { 
@@ -1116,7 +961,6 @@ function openManagerModal() {
     renderManagerLists();
     document.getElementById('manager-modal').style.display = 'flex'; 
 }
-
 function closeManagerModal() { document.getElementById('manager-modal').style.display = 'none'; }
 
 function saveMember() {
@@ -1127,10 +971,7 @@ function saveMember() {
     const ig = document.getElementById('m-ig').value.trim();
     const fb = document.getElementById('m-fb').value.trim();
 
-    if (!name) {
-        alert("Please enter a name.");
-        return;
-    }
+    if (!name) return alert("Please enter a name.");
 
     const memberData = { name, role, img, ig, fb };
 
@@ -1141,11 +982,7 @@ function saveMember() {
     }
 
     saveToDatabase();
-    renderTeam();
     closeMemberModal();
-    if(document.getElementById('manager-modal').style.display === 'flex') {
-        renderManagerLists();
-    }
 }
 
 function deleteMember(index) {
@@ -1153,10 +990,6 @@ function deleteMember(index) {
     if (confirm("Delete this team member?")) {
         teamMembers.splice(index, 1);
         saveToDatabase();
-        renderTeam();
-        if(document.getElementById('manager-modal').style.display === 'flex') {
-            renderManagerLists();
-        }
     }
 }
 
@@ -1165,10 +998,7 @@ function openImgModal(src) {
     document.getElementById('modal-img').src = src;
     document.getElementById('img-modal').style.display = 'flex';
 }
-
-function closeImgModal() {
-    document.getElementById('img-modal').style.display = 'none';
-}
+function closeImgModal() { document.getElementById('img-modal').style.display = 'none'; }
 
 function renderTeam() {
     const container = document.getElementById('team-hierarchy');
@@ -1213,9 +1043,7 @@ function renderTeam() {
                 <img src="${member.img}" alt="${member.name}" class="team-avatar" onclick="openImgModal('${member.img}')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'80\\' height=\\'80\\'><rect width=\\'80\\' height=\\'80\\' fill=\\'%23111\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%23dc143c\\' font-size=\\'12\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>NO IMG</text></svg>'">
                 <div class="team-name">${member.name}</div>
                 <div class="team-role">${member.role}</div>
-                <div class="team-actions">
-                    ${socialsHtml}
-                </div>
+                <div class="team-actions">${socialsHtml}</div>
             `;
             tierDiv.appendChild(card);
         });
@@ -1227,7 +1055,6 @@ function renderTeam() {
 function renderManagerLists() {
     const list = document.getElementById('manager-team-list');
     list.innerHTML = '';
-
     if (teamMembers.length === 0) {
         list.innerHTML = '<div style="color:#666; font-size:0.7rem; padding:5px;">No team members found.</div>';
         return;
@@ -1253,11 +1080,7 @@ function renderManagerLists() {
 // Background Matrix Canvas Animation
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
-
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
@@ -1275,19 +1098,14 @@ function drawCanvas() {
     for (let i = 0; i < drops.length; i++) {
         const text = chars.charAt(Math.floor(Math.random() * chars.length));
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-            drops[i] = 0;
-        }
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
     }
 }
 setInterval(drawCanvas, 33);
 
-// Page Initialization
-loadSavedBanner();
-applyMemberBtnStyles();
-renderTeam();
+// Initialize Cloud Connection
+listenToCloud();
 checkAdminAccess();
 </script>
 </body>
