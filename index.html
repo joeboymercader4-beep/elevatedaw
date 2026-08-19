@@ -4,7 +4,203 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ELEVATE</title>
+</head>
+<body>
+
+
+<!-- Overlay Screen -->
+<div id="overlay">
+<div class="overlay-content">
+    <img src="assets/download.gif" alt="Overlay Logo" class="overlay-img" onerror="this.style.display='none'">
+    <h2 style="margin-bottom: 10px;">ELEVATE</h2>
+    <button class="overlay-btn" onclick="startPage()">ENTER</button>
+</div>
+</div>
+
+<!-- Admin Dropdown Menu (Top Right) -->
+<div class="admin-wrapper">
+<button class="admin-main-btn" onclick="toggleAdminMenu()">⚙ ADMIN MENU</button>
+<div id="admin-dropdown" class="admin-dropdown-menu">
+    <button class="action-btn" onclick="openBannerCustomizeModal()">✏ CUSTOMIZE BANNER</button>
+    <button class="action-btn" onclick="openBtnCustomizeModal()">🎨 CUSTOMIZE MEMBER BUTTONS</button>
+    <button class="action-btn" onclick="document.getElementById('top-banner-input').click()">+ SET BANNER IMAGE</button>
+    <button class="action-btn" onclick="setMemberPin()">🔑 SET MEMBER PIN</button>
+    <button class="action-btn" onclick="openMemberModal()">+ ADD MEMBER</button>
+    <button class="action-btn" onclick="openManagerModal()">⚙ MANAGE DATA</button>
+    <button class="action-btn" id="audio-toggle-btn" onclick="toggleAudio()">⏸ PAUSE AUDIO</button>
+    <button class="action-btn danger" onclick="resetDatabase()">RESET ALL DATA</button>
+    <button class="action-btn danger" style="margin-top:5px; border-style:dashed;" onclick="logoutAdmin()">🔒 LOGOUT ADMIN</button>
+</div>
+</div>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Hidden File Input for Top Banner Upload -->
+<input type="file" id="top-banner-input" accept="image/*" style="display: none;" onchange="handleBannerUpload(this)">
+
+<!-- Single Main View: Team Page -->
+<div class="page-section">
+<!-- Top Image Banner Frame -->
+<div class="team-top-banner" id="banner-container">
+    <img id="top-banner-img" 
+            src="C:\Users\Akira1\Downloads\elev.gif" 
+            alt="Top Banner GIF" 
+            onerror="this.onerror=null; this.src='assets/elevate-banner.jpg'; handleBannerFallback(this);">
+    <span id="banner-placeholder-text" class="banner-placeholder" style="display:none;">[ TOP BLANK IMAGE SLOT ]</span>
+    <button class="banner-admin-btn" onclick="openBannerCustomizeModal()">✏ </button>
+</div>
+
+<h2 style="color: rgb(228, 228, 228); margin-bottom: 25px;">THE TEAM</h2>
+<div id="team-hierarchy" class="team-hierarchy"></div>
+</div>
+
+<!-- Modal: Customize Banner Style & Image -->
+<div id="banner-customize-modal">
+<div class="modal-content">
+<h3>CUSTOMIZE BANNER</h3>
+
+<label>Upload New Banner Image</label>
+<input type="file" accept="image/*" onchange="handleBannerUpload(this)">
+
+<label>Banner Height (px)</label>
+<input type="text" id="b-height" placeholder="e.g. 220">
+
+<label>Border Style</label>
+<select id="b-border-style">
+    <option value="dashed">Dashed</option>
+    <option value="solid">Solid</option>
+    <option value="double">Double</option>
+    <option value="dotted">Dotted</option>
+</select>
+
+<label>Border & Glow Color</label>
+<div class="color-input-group">
+    <input type="color" id="b-color-picker" value="#dc143c" onchange="document.getElementById('b-color-text').value = this.value">
+    <input type="text" id="b-color-text" placeholder="#dc143c" style="flex:1;">
+</div>
+
+<label>Glow Shadow Intensity (px)</label>
+<input type="text" id="b-glow" placeholder="e.g. 15">
+
+<label>Image Fit Style</label>
+<select id="b-fit">
+    <option value="cover">Cover (Full Bleed)</option>
+    <option value="contain">Contain (Fit Whole Image)</option>
+</select>
+
+<div style="display: flex; gap: 8px; margin-top: 10px;">
+    <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBannerCustomizations()">SAVE</button>
+    <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBannerCustomizeModal()">CANCEL</button>
+</div>
+</div>
+</div>
+
+<!-- Modal: Customize Member Card Buttons -->
+<div id="btn-customize-modal">
+<div class="modal-content">
+<h3>CUSTOMIZE MEMBER BUTTONS</h3>
+
+<label>Background Color</label>
+<div class="color-input-group">
+    <input type="color" id="mb-bg-picker" value="#dc143c" onchange="document.getElementById('mb-bg-text').value = this.value">
+    <input type="text" id="mb-bg-text" placeholder="rgba(220, 20, 60, 0.1)" style="flex:1;">
+</div>
+
+<label>Text / Icon Color</label>
+<div class="color-input-group">
+    <input type="color" id="mb-text-picker" value="#dc143c" onchange="document.getElementById('mb-text-text').value = this.value">
+    <input type="text" id="mb-text-text" placeholder="#dc143c" style="flex:1;">
+</div>
+
+<label>Border Color</label>
+<div class="color-input-group">
+    <input type="color" id="mb-border-picker" value="#dc143c" onchange="document.getElementById('mb-border-text').value = this.value">
+    <input type="text" id="mb-border-text" placeholder="#dc143c" style="flex:1;">
+</div>
+
+<label>Hover Background Color</label>
+<div class="color-input-group">
+    <input type="color" id="mb-hbg-picker" value="#dc143c" onchange="document.getElementById('mb-hbg-text').value = this.value">
+    <input type="text" id="mb-hbg-text" placeholder="#dc143c" style="flex:1;">
+</div>
+
+<label>Hover Text Color</label>
+<div class="color-input-group">
+    <input type="color" id="mb-htext-picker" value="#000000" onchange="document.getElementById('mb-htext-text').value = this.value">
+    <input type="text" id="mb-htext-text" placeholder="#000000" style="flex:1;">
+</div>
+
+<label>Border Style</label>
+<select id="mb-border-style">
+    <option value="solid">Solid</option>
+    <option value="dashed">Dashed</option>
+    <option value="double">Double</option>
+    <option value="dotted">Dotted</option>
+</select>
+
+<label>Border Radius (px)</label>
+<input type="text" id="mb-radius" placeholder="e.g. 4">
+
+<div style="display: flex; gap: 8px; margin-top: 10px;">
+    <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBtnCustomizations()">SAVE</button>
+    <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBtnCustomizeModal()">CANCEL</button>
+</div>
+</div>
+</div>
+
+<!-- Modal Form: Add / Edit Member -->
+<div id="member-modal">
+<div class="modal-content">
+<h3 id="modal-title">ADD CREW MEMBER</h3>
+
+<label>Profile Picture (Choose Local File to Replace)</label>
+<input type="file" id="m-img-file" accept="image/*" onchange="previewAvatar(this)">
+<img id="avatar-preview" class="avatar-preview-box" src="" alt="Avatar Preview">
+
+<label>Name</label>
+<input type="text" id="m-name" placeholder="AKI">
+<label>Role</label>
+<input type="text" id="m-role" placeholder="Leader / Core Developer / Member">
+<label>Instagram Profile URL</label>
+<input type="text" id="m-ig" placeholder="https://instagram.com/yourusername">
+<label>Facebook Profile URL</label>
+<input type="text" id="m-fb" placeholder="https://facebook.com/yourprofile">
+<label>Preferred Music (.mp3 URL / Local Path)</label>
+<input type="text" id="m-music" placeholder="C:\Users\Akira1\Downloads\ytmp3free.cc_still-into-you-drill-remix-lyrics-prod-shobeatz-cause-after-all-this-time-im-still-into-you-youtubemp3free.org.mp3">
+
+<div style="display: flex; gap: 8px; margin-top: 10px;">
+<button class="action-btn" style="flex:1; text-align:center;" onclick="saveMember()">SAVE</button>
+<button class="action-btn" style="flex:1; text-align:center;" onclick="closeMemberModal()">CANCEL</button>
+</div>
+</div>
+</div>
+
+<!-- Modal: Data Manager -->
+<div id="manager-modal">
+<div class="modal-content">
+<h3>MANAGE DATA ENTRIES</h3>
+
+<label style="color: crimson; font-weight: bold; margin-top: 5px;">TEAM MEMBERS</label>
+<div id="manager-team-list" class="manager-list"></div>
+
+<div style="display: flex; gap: 8px; margin-top: 15px;">
+<button class="action-btn" style="flex:1; text-align:center;" onclick="closeManagerModal()">CLOSE</button>
+</div>
+</div>
+</div>
+
+<!-- Modal: Image Preview -->
+<div id="img-modal" onclick="closeImgModal()">
+<img id="modal-img" src="" alt="Preview">
+</div>
+
+<audio id="bg-audio" loop preload="auto"></audio>
+
+</body>
+</html>
 <style>
+    style.css
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { 
 background: #0a0a0a; 
@@ -526,199 +722,67 @@ transition: all 0.3s ease;
 100% { transform: translate(0, 0); opacity: 0; visibility: hidden; }
 }
 </style>
-</head>
-<body>
-
-<!-- Overlay Screen -->
-<div id="overlay">
-<div class="overlay-content">
-    <img src="assets/download.gif" alt="Overlay Logo" class="overlay-img" onerror="this.style.display='none'">
-    <h2 style="margin-bottom: 10px;">ELEVATE</h2>
-    <button class="overlay-btn" onclick="startPage()">ENTER</button>
-</div>
-</div>
-
-<!-- Admin Dropdown Menu (Top Right) -->
-<div class="admin-wrapper">
-<button class="admin-main-btn" onclick="toggleAdminMenu()">⚙ ADMIN MENU</button>
-<div id="admin-dropdown" class="admin-dropdown-menu">
-    <button class="action-btn" onclick="openBannerCustomizeModal()">✏ CUSTOMIZE BANNER</button>
-    <button class="action-btn" onclick="openBtnCustomizeModal()">🎨 CUSTOMIZE MEMBER BUTTONS</button>
-    <button class="action-btn" onclick="document.getElementById('top-banner-input').click()">+ SET BANNER IMAGE</button>
-    <button class="action-btn" onclick="setMemberPin()">🔑 SET MEMBER PIN</button>
-    <button class="action-btn" onclick="openMemberModal()">+ ADD MEMBER</button>
-    <button class="action-btn" onclick="openManagerModal()">⚙ MANAGE DATA</button>
-    <button class="action-btn" id="audio-toggle-btn" onclick="toggleAudio()">⏸ PAUSE AUDIO</button>
-    <button class="action-btn danger" onclick="resetDatabase()">RESET ALL DATA</button>
-    <button class="action-btn danger" style="margin-top:5px; border-style:dashed;" onclick="logoutAdmin()">🔒 LOGOUT ADMIN</button>
-</div>
-</div>
-
-<canvas id="bg-canvas"></canvas>
-
-<!-- Hidden File Input for Top Banner Upload -->
-<input type="file" id="top-banner-input" accept="image/*" style="display: none;" onchange="handleBannerUpload(this)">
-
-<!-- Single Main View: Team Page -->
-<div class="page-section">
-<!-- Top Image Banner Frame -->
-<div class="team-top-banner" id="banner-container">
-    <img id="top-banner-img" 
-            src="C:\Users\Akira1\Downloads\elev.gif" 
-            alt="Top Banner GIF" 
-            onerror="this.onerror=null; this.src='assets/elevate-banner.jpg'; handleBannerFallback(this);">
-    <span id="banner-placeholder-text" class="banner-placeholder" style="display:none;">[ TOP BLANK IMAGE SLOT ]</span>
-    <button class="banner-admin-btn" onclick="openBannerCustomizeModal()">✏ </button>
-</div>
-
-<h2 style="color: rgb(228, 228, 228); margin-bottom: 25px;">THE TEAM</h2>
-<div id="team-hierarchy" class="team-hierarchy"></div>
-</div>
-
-<!-- Modal: Customize Banner Style & Image -->
-<div id="banner-customize-modal">
-<div class="modal-content">
-<h3>CUSTOMIZE BANNER</h3>
-
-<label>Upload New Banner Image</label>
-<input type="file" accept="image/*" onchange="handleBannerUpload(this)">
-
-<label>Banner Height (px)</label>
-<input type="text" id="b-height" placeholder="e.g. 220">
-
-<label>Border Style</label>
-<select id="b-border-style">
-    <option value="dashed">Dashed</option>
-    <option value="solid">Solid</option>
-    <option value="double">Double</option>
-    <option value="dotted">Dotted</option>
-</select>
-
-<label>Border & Glow Color</label>
-<div class="color-input-group">
-    <input type="color" id="b-color-picker" value="#dc143c" onchange="document.getElementById('b-color-text').value = this.value">
-    <input type="text" id="b-color-text" placeholder="#dc143c" style="flex:1;">
-</div>
-
-<label>Glow Shadow Intensity (px)</label>
-<input type="text" id="b-glow" placeholder="e.g. 15">
-
-<label>Image Fit Style</label>
-<select id="b-fit">
-    <option value="cover">Cover (Full Bleed)</option>
-    <option value="contain">Contain (Fit Whole Image)</option>
-</select>
-
-<div style="display: flex; gap: 8px; margin-top: 10px;">
-    <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBannerCustomizations()">SAVE</button>
-    <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBannerCustomizeModal()">CANCEL</button>
-</div>
-</div>
-</div>
-
-<!-- Modal: Customize Member Card Buttons -->
-<div id="btn-customize-modal">
-<div class="modal-content">
-<h3>CUSTOMIZE MEMBER BUTTONS</h3>
-
-<label>Background Color</label>
-<div class="color-input-group">
-    <input type="color" id="mb-bg-picker" value="#dc143c" onchange="document.getElementById('mb-bg-text').value = this.value">
-    <input type="text" id="mb-bg-text" placeholder="rgba(220, 20, 60, 0.1)" style="flex:1;">
-</div>
-
-<label>Text / Icon Color</label>
-<div class="color-input-group">
-    <input type="color" id="mb-text-picker" value="#dc143c" onchange="document.getElementById('mb-text-text').value = this.value">
-    <input type="text" id="mb-text-text" placeholder="#dc143c" style="flex:1;">
-</div>
-
-<label>Border Color</label>
-<div class="color-input-group">
-    <input type="color" id="mb-border-picker" value="#dc143c" onchange="document.getElementById('mb-border-text').value = this.value">
-    <input type="text" id="mb-border-text" placeholder="#dc143c" style="flex:1;">
-</div>
-
-<label>Hover Background Color</label>
-<div class="color-input-group">
-    <input type="color" id="mb-hbg-picker" value="#dc143c" onchange="document.getElementById('mb-hbg-text').value = this.value">
-    <input type="text" id="mb-hbg-text" placeholder="#dc143c" style="flex:1;">
-</div>
-
-<label>Hover Text Color</label>
-<div class="color-input-group">
-    <input type="color" id="mb-htext-picker" value="#000000" onchange="document.getElementById('mb-htext-text').value = this.value">
-    <input type="text" id="mb-htext-text" placeholder="#000000" style="flex:1;">
-</div>
-
-<label>Border Style</label>
-<select id="mb-border-style">
-    <option value="solid">Solid</option>
-    <option value="dashed">Dashed</option>
-    <option value="double">Double</option>
-    <option value="dotted">Dotted</option>
-</select>
-
-<label>Border Radius (px)</label>
-<input type="text" id="mb-radius" placeholder="e.g. 4">
-
-<div style="display: flex; gap: 8px; margin-top: 10px;">
-    <button class="action-btn" style="flex:1; text-align:center;" onclick="saveBtnCustomizations()">SAVE</button>
-    <button class="action-btn" style="flex:1; text-align:center;" onclick="closeBtnCustomizeModal()">CANCEL</button>
-</div>
-</div>
-</div>
-
-<!-- Modal Form: Add / Edit Member -->
-<div id="member-modal">
-<div class="modal-content">
-<h3 id="modal-title">ADD CREW MEMBER</h3>
-
-<label>Profile Picture (Choose Local File to Replace)</label>
-<input type="file" id="m-img-file" accept="image/*" onchange="previewAvatar(this)">
-<img id="avatar-preview" class="avatar-preview-box" src="" alt="Avatar Preview">
-
-<label>Name</label>
-<input type="text" id="m-name" placeholder="AKI">
-<label>Role</label>
-<input type="text" id="m-role" placeholder="Leader / Core Developer / Member">
-<label>Instagram Profile URL</label>
-<input type="text" id="m-ig" placeholder="https://instagram.com/yourusername">
-<label>Facebook Profile URL</label>
-<input type="text" id="m-fb" placeholder="https://facebook.com/yourprofile">
-<label>Preferred Music (.mp3 URL / Local Path)</label>
-<input type="text" id="m-music" placeholder="C:\Users\Akira1\Downloads\ytmp3free.cc_still-into-you-drill-remix-lyrics-prod-shobeatz-cause-after-all-this-time-im-still-into-you-youtubemp3free.org.mp3">
-
-<div style="display: flex; gap: 8px; margin-top: 10px;">
-<button class="action-btn" style="flex:1; text-align:center;" onclick="saveMember()">SAVE</button>
-<button class="action-btn" style="flex:1; text-align:center;" onclick="closeMemberModal()">CANCEL</button>
-</div>
-</div>
-</div>
-
-<!-- Modal: Data Manager -->
-<div id="manager-modal">
-<div class="modal-content">
-<h3>MANAGE DATA ENTRIES</h3>
-
-<label style="color: crimson; font-weight: bold; margin-top: 5px;">TEAM MEMBERS</label>
-<div id="manager-team-list" class="manager-list"></div>
-
-<div style="display: flex; gap: 8px; margin-top: 15px;">
-<button class="action-btn" style="flex:1; text-align:center;" onclick="closeManagerModal()">CLOSE</button>
-</div>
-</div>
-</div>
-
-<!-- Modal: Image Preview -->
-<div id="img-modal" onclick="closeImgModal()">
-<img id="modal-img" src="" alt="Preview">
-</div>
-
-<audio id="bg-audio" loop preload="auto"></audio>
 
 <script>
-const ADMIN_PIN = "080205";
+// ==========================================
+// JSONBIN CONFIGURATION
+// Palitan ang mga halaga sa ibaba ng sarili mong keys mula sa JSONBin.io
+// ==========================================
+const JSONBIN_BIN_ID = "6a8560d8f5f4af5e2927a086 "; 
+const JSONBIN_MASTER_KEY = "$2a$10$Aj5Rxp2KGKnDjPkphFXneOPtefWeBg0cvYo1UBB2ff2T8dyMTHBxm"; 
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+// 1. KUNIN ANG MEMBERS MULA SA ONLINE DATABASE (READ)
+async function loadMembersFromCloud() {
+    try {
+        const response = await fetch(`${JSONBIN_URL}/latest`, {
+            method: 'GET',
+            headers: {
+                'X-Master-Key': JSONBIN_MASTER_KEY
+            }
+        });
+        if (response.ok) {
+            const result = await response.json();
+            teamMembers = result.record || [];
+            renderTeam(); // I-refresh ang UI kapag nakuha na ang live data
+        } else {
+            console.error("Failed to load data from JSONBin");
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
+
+// 2. I-SAVE ANG MEMBERS SA ONLINE DATABASE (WRITE)
+async function saveToDatabase() {
+    // I-save pa rin sa localStorage bilang local fallback
+    localStorage.setItem('cyberHub_teamMembers', JSON.stringify(teamMembers));
+    localStorage.setItem('cyberHub_memberPin', memberAccessPin);
+    localStorage.setItem('cyberHub_bannerStyle', JSON.stringify(bannerStyleConfig));
+    localStorage.setItem('cyberHub_memberBtnStyle', JSON.stringify(memberBtnStyleConfig));
+    if (customTopBanner) {
+        localStorage.setItem('cyberHub_topBanner', customTopBanner);
+    }
+
+    // ONLINE CLOUD SYNC: I-update ang JSONBin server
+    try {
+        await fetch(JSONBIN_URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': JSONBIN_MASTER_KEY
+            },
+            body: JSON.stringify(teamMembers)
+        });
+        console.log("Successfully synced with cloud database!");
+    } catch (error) {
+        console.error("Cloud sync error:", error);
+    }
+}
+
+
+
+    const ADMIN_PIN = "080205";
 let memberAccessPin = localStorage.getItem('cyberHub_memberPin') || "1234"; 
 let isAdminAuthorized = false;
 
@@ -1207,9 +1271,8 @@ for (let i = 0; i < drops.length; i++) {
 setInterval(drawCanvas, 33);
 
 // Initialize Page Data & Layout Settings
+// Initialize Page Data & Load Live Members
 loadSavedBanner();
 applyMemberBtnStyles();
-renderTeam();
+loadMembersFromCloud(); // Kukunin ang pinakabagong members online para sa lahat ng bisita
 </script>
-</body>
-</html>
