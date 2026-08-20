@@ -179,12 +179,11 @@ position: relative;
 padding: 40px 15px 40px;
 }
 
-/* Dynamic Customizable Banner Framing */
+/* Dynamic Customizable Banner Framing (Original) */
 .team-top-banner {
 width: 95%;
 max-width: 850px;
-min-height: 220px;
-height: auto;
+height: 220px;
 border: 1.5px dashed crimson;
 border-radius: 8px;
 background: rgba(10, 10, 10, 0.85);
@@ -201,7 +200,6 @@ transition: all 0.3s ease;
 .team-top-banner img {
 width: 100%;
 height: 100%;
-max-height: 400px;
 object-fit: contain;
 object-position: center;
 display: block;
@@ -386,19 +384,17 @@ z-index: 10;
 .card-admin-btn { background: rgba(0,0,0,0.6); border: none; color: #fff; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
 .card-admin-btn:hover { color: crimson; background: #000; }
 
-/* --- GALLERY STYLES --- */
+/* GALLERY STYLES */
 .gallery-section-title {
 color: #e4e4e4;
 margin: 50px 0 20px 0;
 letter-spacing: 2px;
 }
 
-/* Gallery Toolbar: Hidden by default for regular users */
 .gallery-toolbar {
 display: none !important;
 }
 
-/* Shows toolbar only when Admin */
 body.is-admin .gallery-toolbar {
 display: flex !important;
 gap: 10px;
@@ -970,6 +966,7 @@ function applyBannerStyles() {
 const container = document.getElementById('banner-container');
 const img = document.getElementById('top-banner-img');
 if (bannerStyleConfig) {
+container.style.height = `${bannerStyleConfig.height || 220}px`;
 container.style.borderStyle = bannerStyleConfig.borderStyle || 'dashed';
 container.style.borderColor = bannerStyleConfig.borderColor || 'crimson';
 container.style.boxShadow = `0 0 ${bannerStyleConfig.glow || 15}px ${bannerStyleConfig.borderColor || 'crimson'}`;
@@ -1228,8 +1225,7 @@ saveToDatabase();
 }
 }
 
-// ==================== GALLERY FUNCTIONS ====================
-
+// GALLERY FUNCTIONS
 function previewGalleryImg(input) {
 const file = input.files[0];
 if (file) {
