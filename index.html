@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ELEVATE</title>
 
-<!-- Firebase SDKs -->
+<!-- Firebase SDKs (Compat Namespace) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -18,7 +18,6 @@ font-family: 'Courier New', monospace;
 overflow-x: hidden;
 }
 
-/* Base style para sa lahat ng borders na may support para sa GIF background */
 .gif-bg-supported {
 background-size: cover !important;
 background-position: center !important;
@@ -26,7 +25,6 @@ background-repeat: no-repeat !important;
 position: relative;
 }
 
-/* Welcome Entry Screen Overlay */
 #welcome-screen {
 position: fixed;
 top: 0; left: 0;
@@ -81,7 +79,6 @@ opacity: 0.35;
 pointer-events: none;
 }
 
-/* Upper Right Admin Controls Dropdown */
 .admin-wrapper {
 position: fixed;
 top: 15px;
@@ -145,7 +142,6 @@ width: 100%;
 .action-btn.danger { border-color: #ff3333; color: #ff3333; }
 .action-btn.danger:hover { background: #ff3333; color: #0a0a0a; }
 
-/* Fixed Background Music Control Bar */
 .bg-music-floating-bar {
 position: fixed;
 bottom: 15px;
@@ -173,7 +169,6 @@ cursor: pointer;
 
 .bg-music-floating-bar button:hover { color: #fff; }
 
-/* Main Page Container */
 .page-section {
 display: flex;
 flex-direction: column;
@@ -187,7 +182,6 @@ position: relative;
 padding: 40px 15px 40px;
 }
 
-/* Dynamic Customizable Banner Framing */
 .team-top-banner {
 width: 95%;
 max-width: 850px;
@@ -245,7 +239,6 @@ body.is-admin .banner-admin-btn { display: block !important; }
 body.is-admin .card-admin-controls { display: flex !important; }
 body.is-admin .gallery-admin-controls { display: flex !important; }
 
-/* Hierarchical Tree Container */
 .team-hierarchy {
 display: flex;
 flex-direction: column;
@@ -278,7 +271,6 @@ background: crimson;
 box-shadow: 0 0 8px crimson;
 }
 
-/* User Info Card Background GIF & Overlay */
 .team-card {
 background: rgba(10, 10, 10, 0.85);
 background-size: cover !important;
@@ -297,7 +289,6 @@ transition: all 0.3s ease;
 overflow: hidden;
 }
 
-/* Semi-transparent dark overlay para manatiling nababasa ang text sa ibabaw ng GIF */
 .team-card::before, .gallery-card::before {
 content: '';
 position: absolute;
@@ -393,7 +384,6 @@ z-index: 10;
 .card-admin-btn { background: rgba(0,0,0,0.6); border: none; color: #fff; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
 .card-admin-btn:hover { color: crimson; background: #000; }
 
-/* GALLERY STYLES */
 .gallery-section-title {
 color: #e4e4e4;
 margin: 50px 0 20px 0;
@@ -469,7 +459,6 @@ gap: 5px;
 z-index: 10;
 }
 
-/* Modals Setup */
 #member-modal, #img-modal, #manager-modal, #banner-customize-modal, #btn-customize-modal, #bg-music-modal, #gallery-modal, #trash-modal {
 position: fixed;
 top: 0; left: 0;
@@ -548,13 +537,11 @@ display: block;
 </head>
 <body>
 
-<!-- Welcome Entry Overlay Screen -->
 <div id="welcome-screen">
 <div class="welcome-title">ELEVATE ANO TARA?</div>
 <button class="welcome-btn" onclick="enterWebsite()">CLICK MO MUNA!</button>
 </div>
 
-<!-- Admin Dropdown Menu -->
 <div class="admin-wrapper" id="admin-menu-wrapper">
 <button class="admin-main-btn" onclick="toggleAdminMenu()">⚙ ADMIN MENU</button>
 <div id="admin-dropdown" class="admin-dropdown-menu">
@@ -563,7 +550,7 @@ display: block;
 <button class="action-btn" onclick="openBgMusicModal()">🎵 SET BACKGROUND MUSIC</button>
 <button class="action-btn" onclick="document.getElementById('top-banner-input').click()">+ SET BANNER GIF / IMAGE</button>
 <button class="action-btn" onclick="setMemberPin()">🔑 SET MEMBER PIN</button>
-<button class="action-btn" onclick="openMemberModal()">+ ADD MEMBER (WITH CARD GIF)</button>
+<button class="action-btn" onclick="openMemberModal(-1)">+ ADD MEMBER (WITH CARD GIF)</button>
 <button class="action-btn" onclick="openGalleryModal()">🖼 ADD GALLERY PHOTO</button>
 <button class="action-btn" onclick="openTrashModal()">♻ RESTORE DELETED PHOTOS</button>
 <button class="action-btn" onclick="openManagerModal()">⚙ MANAGE DATA</button>
@@ -573,7 +560,6 @@ display: block;
 </div>
 </div>
 
-<!-- Floating Audio Controller (Global BGM) -->
 <div class="bg-music-floating-bar">
 <button id="float-audio-btn" onclick="toggleAudio()">▶ BGM: PLAY</button>
 </div>
@@ -584,7 +570,7 @@ display: block;
 
 <div class="page-section">
 <div class="team-top-banner gif-bg-supported" id="banner-container">
-<img id="top-banner-img" src=" " alt="Top Banner GIF" onerror="handleBannerFallback(this)">
+<img id="top-banner-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Top Banner GIF" onerror="handleBannerFallback()">
 <span id="banner-placeholder-text" class="banner-placeholder" style="display:none;">[ TOP BLANK IMAGE SLOT ]</span>
 <button class="banner-admin-btn" onclick="openBannerCustomizeModal()">✏ EDIT BANNER</button>
 </div>
@@ -592,7 +578,6 @@ display: block;
 <h2 style="color: rgb(228, 228, 228); margin-bottom: 25px;">TEAM</h2>
 <div id="team-hierarchy" class="team-hierarchy"></div>
 
-<!-- GALLERY SECTION -->
 <h2 class="gallery-section-title">GALLERY</h2>
 <div class="gallery-toolbar">
 <button class="sm-btn" onclick="openGalleryModal()">+ ADD PICTURE</button>
@@ -698,11 +683,11 @@ display: block;
 <h3 id="modal-title">ADD CREW MEMBER</h3>
 <label>Profile Picture</label>
 <input type="file" id="m-img-file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="previewAvatar(this)">
-<img id="avatar-preview" class="avatar-preview-box" src="" alt="Avatar Preview">
+<img id="avatar-preview" class="avatar-preview-box" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Avatar Preview">
 
 <label style="margin-top:5px; color:crimson; font-weight:bold;">User Card GIF Background</label>
 <input type="file" id="m-card-bg-file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="previewCardBg(this)">
-<img id="card-bg-preview" class="card-bg-preview-box" src="" alt="Card BG Preview" style="display:none;">
+<img id="card-bg-preview" class="card-bg-preview-box" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Card BG Preview" style="display:none;">
 <button type="button" class="sm-btn" style="margin-top: 3px;" onclick="removeCardBg()">Clear Card GIF Background</button>
 
 <label style="margin-top:5px;">Name</label>
@@ -720,13 +705,12 @@ display: block;
 </div>
 </div>
 
-<!-- GALLERY ADD/MODIFY MODAL -->
 <div id="gallery-modal">
 <div class="modal-content">
 <h3 id="gallery-modal-title">ADD GALLERY PHOTO</h3>
 <label>Select Picture / GIF</label>
 <input type="file" id="g-img-file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="previewGalleryImg(this)">
-<img id="gallery-preview" class="card-bg-preview-box" src="" alt="Gallery Preview" style="display:none; height:100px;">
+<img id="gallery-preview" class="card-bg-preview-box" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Gallery Preview" style="display:none; height:100px;">
 <label style="margin-top:5px;">Caption / Title</label>
 <input type="text" id="g-caption" placeholder="Team Memory / Event Name">
 <div style="display: flex; gap: 8px; margin-top: 10px;">
@@ -736,7 +720,6 @@ display: block;
 </div>
 </div>
 
-<!-- TRASH / RESTORE MODAL -->
 <div id="trash-modal">
 <div class="modal-content">
 <h3>RESTORE DELETED PHOTOS</h3>
@@ -759,13 +742,12 @@ display: block;
 </div>
 
 <div id="img-modal" onclick="closeImgModal()">
-<img id="modal-img" src="" alt="Preview">
+<img id="modal-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Preview">
 </div>
 
 <audio id="bg-audio" loop preload="auto"></audio>
 
 <script>
-// Your web app's Firebase configuration
 const firebaseConfig = {
 apiKey: "AIzaSyBQLI9qPA7-bbO8jG4I13KnJ3ZDGrpONJc",
 authDomain: "elevate-9cbb2.firebaseapp.com",
@@ -777,11 +759,11 @@ appId: "1:321202812524:web:9dae041613662f2d0cca49",
 measurementId: "G-N2W12BCXVW"
 };
 
-// Initialize Firebase (Compat mode for browser script tags)
-if (!firebase.apps.length) {
-firebase.initializeApp(firebaseConfig);
+// Safety Check para sa Firebase Initialization
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
 }
-const db = firebase.database();
+const db = (typeof firebase !== 'undefined' && firebase.apps.length) ? firebase.database() : null;
 
 const ADMIN_PIN = "080205";
 let memberAccessPin = "1234"; 
@@ -803,10 +785,14 @@ let globalBgMusic = "assets/bg-music.mp3";
 let bannerStyleConfig = { height: "220", borderStyle: "dashed", borderColor: "#dc143c", glow: "15", fit: "contain" };
 let memberBtnStyleConfig = { bg: "rgba(220, 20, 60, 0.1)", color: "#dc143c", borderColor: "#dc143c", hoverBg: "#dc143c", hoverColor: "#000000", borderStyle: "solid", radius: "4" };
 
-const igIcon = `<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`;
-const fbIcon = `<svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>`;
+const igIcon = '<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>';
+const fbIcon = '<svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>';
 
 function saveToDatabase() {
+if (!db) {
+    console.error("Firebase DB instance missing.");
+    return;
+}
 const fullPayload = {
 teamMembers,
 galleryItems,
@@ -817,10 +803,17 @@ memberBtnStyleConfig,
 globalBgMusic,
 customTopBanner
 };
-db.ref('cyberHubData').set(fullPayload);
+
+db.ref('cyberHubData').set(fullPayload).then(() => {
+    console.log("Successfully saved to Firebase!");
+}).catch((error) => {
+    console.error("Firebase write failed: ", error);
+    alert("Error sa pag-save! Baka masyadong malaki ang image file o GIF background na inilagay mo.");
+});
 }
 
 function listenToCloud() {
+if (!db) return;
 db.ref('cyberHubData').on('value', (snapshot) => {
 const data = snapshot.val();
 if (data) {
@@ -838,7 +831,7 @@ renderGallery();
 loadSavedBanner();
 applyMemberBtnStyles();
 
-if (audio.src !== globalBgMusic) {
+if (audio && audio.src !== globalBgMusic) {
 audio.src = globalBgMusic;
 }
 
@@ -849,6 +842,8 @@ if (document.getElementById('trash-modal').style.display === 'flex') {
 renderTrashList();
 }
 }
+}, (error) => {
+    console.error("Firebase read failed: ", error);
 });
 }
 
@@ -857,10 +852,10 @@ const welcomeScreen = document.getElementById('welcome-screen');
 welcomeScreen.style.opacity = '0';
 welcomeScreen.style.visibility = 'hidden';
 
-if (globalBgMusic) {
+if (globalBgMusic && audio) {
 audio.src = globalBgMusic;
 audio.volume = 0.5;
-audio.play().then(() => updateAudioUI()).catch(err => console.log("Audio deferred:", err));
+audio.play().then(() => updateAudioUI()).catch(err => console.log("Audio play deferred by browser policy:", err));
 }
 }
 
@@ -899,8 +894,8 @@ if (['BUTTON', 'INPUT', 'A', 'SELECT'].includes(e.target.tagName)) return;
 longPressTimer = setTimeout(() => { showAdminPanel(); }, 2000);
 });
 
-window.addEventListener('touchend', function(e) { clearTimeout(longPressTimer); });
-window.addEventListener('touchmove', function(e) { clearTimeout(longPressTimer); });
+window.addEventListener('touchend', function() { clearTimeout(longPressTimer); });
+window.addEventListener('touchmove', function() { clearTimeout(longPressTimer); });
 
 function openBgMusicModal() {
 if(!isAdminAuthorized) return;
@@ -912,6 +907,10 @@ function closeBgMusicModal() { document.getElementById('bg-music-modal').style.d
 function handleLocalBgMusicUpload(input) {
 const file = input.files[0];
 if (file) {
+if(file.size > 5 * 1024 * 1024) {
+    alert("Warning: Masyadong malaki ang audio file (>5MB). Gamitin ang Direct Audio URL.");
+    return;
+}
 const reader = new FileReader();
 reader.onload = function(e) {
 globalBgMusic = e.target.result;
@@ -926,13 +925,15 @@ if(!isAdminAuthorized) return;
 const urlInput = document.getElementById('bg-music-url').value.trim();
 if (urlInput && urlInput !== "[ Local File Loaded ]") globalBgMusic = urlInput;
 saveToDatabase();
+if (audio) {
 audio.src = globalBgMusic;
-audio.play().then(() => updateAudioUI()).catch(err => alert("Audio loaded."));
+audio.play().then(() => updateAudioUI()).catch(() => alert("Audio track loaded. Click Play to start."));
+}
 closeBgMusicModal();
 }
 
 function toggleAudio() {
-if (!audio.src) return alert("No audio track loaded.");
+if (!audio || !audio.src) return alert("No audio track loaded.");
 if (audio.paused) {
 audio.play().then(() => updateAudioUI());
 } else {
@@ -944,7 +945,7 @@ updateAudioUI();
 function updateAudioUI() {
 const adminBtn = document.getElementById('admin-audio-toggle-btn');
 const floatBtn = document.getElementById('float-audio-btn');
-if (audio.paused) {
+if (audio && audio.paused) {
 if(adminBtn) adminBtn.textContent = "▶ PLAY AUDIO";
 if(floatBtn) floatBtn.textContent = "▶ BGM: PAUSED";
 } else {
@@ -968,7 +969,7 @@ document.documentElement.style.setProperty('--m-btn-radius', `${memberBtnStyleCo
 function applyBannerStyles() {
 const container = document.getElementById('banner-container');
 const img = document.getElementById('top-banner-img');
-if (bannerStyleConfig) {
+if (bannerStyleConfig && container && img) {
 container.style.height = `${bannerStyleConfig.height || 220}px`;
 container.style.borderStyle = bannerStyleConfig.borderStyle || 'dashed';
 container.style.borderColor = bannerStyleConfig.borderColor || 'crimson';
@@ -1147,19 +1148,21 @@ bgPrev.src = "";
 bgPrev.style.display = 'none';
 }
 
+/* FIX 1: TIYAKING NAKA-RESET ANG INDEX KAPAG BAGO AT TIKMAN NA PARATING MAY DEFAULT ROUTE */
 function openMemberModal(index = -1) { 
 if(!isAdminAuthorized) return;
-editMemberIndex = index;
 
-if (index >= 0 && index < teamMembers.length) {
-const member = teamMembers[index];
+editMemberIndex = (typeof index === 'number') ? index : -1;
+
+if (editMemberIndex >= 0 && editMemberIndex < teamMembers.length) {
+const member = teamMembers[editMemberIndex];
 document.getElementById('modal-title').textContent = "EDIT CREW MEMBER";
 document.getElementById('m-name').value = member.name || '';
 document.getElementById('m-role').value = member.role || '';
 document.getElementById('m-ig').value = member.ig || '';
 document.getElementById('m-fb').value = member.fb || '';
 currentAvatarBase64 = member.img || '';
-document.getElementById('avatar-preview').src = member.img || '';
+document.getElementById('avatar-preview').src = member.img || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 currentCardBgBase64 = member.cardBg || '';
 const bgPrev = document.getElementById('card-bg-preview');
@@ -1167,7 +1170,7 @@ if (currentCardBgBase64) {
 bgPrev.src = currentCardBgBase64;
 bgPrev.style.display = 'block';
 } else {
-bgPrev.src = '';
+bgPrev.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 bgPrev.style.display = 'none';
 }
 } else {
@@ -1176,8 +1179,10 @@ document.getElementById('m-name').value = '';
 document.getElementById('m-role').value = '';
 document.getElementById('m-ig').value = '';
 document.getElementById('m-fb').value = '';
+document.getElementById('m-img-file').value = '';
+document.getElementById('m-card-bg-file').value = '';
 currentAvatarBase64 = "";
-document.getElementById('avatar-preview').src = "";
+document.getElementById('avatar-preview').src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 removeCardBg();
 }
 document.getElementById('member-modal').style.display = 'flex'; 
@@ -1197,6 +1202,7 @@ document.getElementById('manager-modal').style.display = 'flex';
 }
 function closeManagerModal() { document.getElementById('manager-modal').style.display = 'none'; }
 
+/* FIX 2: VALIDATION CHECK PARA SA FILE SIZE O BASE64 STRING LENGTH */
 function saveMember() {
 if (!isAdminAuthorized) return;
 const name = document.getElementById('m-name').value.trim();
@@ -1207,6 +1213,12 @@ const ig = document.getElementById('m-ig').value.trim();
 const fb = document.getElementById('m-fb').value.trim();
 
 if (!name) return alert("Please enter a name.");
+
+// Pinipigilan ang sobrang laking GIF/Image base64 para hindi masira ang Realtime Database
+const totalBase64Len = img.length + cardBg.length;
+if (totalBase64Len > 2500000) { 
+return alert("Masyadong malaki ang in-upload na Card Background/Avatar! Paki-maliitan ang GIF/Image size o pumili ng mas maliit na file.");
+}
 
 const memberData = { name, role, img, cardBg, ig, fb };
 
@@ -1228,7 +1240,6 @@ saveToDatabase();
 }
 }
 
-// GALLERY FUNCTIONS
 function previewGalleryImg(input) {
 const file = input.files[0];
 if (file) {
@@ -1273,6 +1284,10 @@ function saveGalleryItem() {
 if (!isAdminAuthorized) return;
 const caption = document.getElementById('g-caption').value.trim();
 if (!currentGalleryBase64) return alert("Please select an image file.");
+
+if (currentGalleryBase64.length > 2500000) {
+return alert("Masyadong malaki ang Gallery Image file! Pumili ng mas maliit na photo/GIF.");
+}
 
 const itemData = { img: currentGalleryBase64, caption: caption };
 
@@ -1326,7 +1341,7 @@ if (!container) return;
 container.innerHTML = '';
 
 if (galleryItems.length === 0) {
-container.innerHTML = `<div style="grid-column: 1/-1; color:#666; font-size:0.8rem;">Walang pictures sa gallery.</div>`;
+container.innerHTML = '<div style="grid-column: 1/-1; color:#666; font-size:0.8rem;">Walang pictures sa gallery.</div>';
 return;
 }
 
@@ -1338,8 +1353,8 @@ card.innerHTML = `
 <button class="card-admin-btn" onclick="openGalleryModal(${index})">✏ EDIT</button>
 <button class="card-admin-btn" onclick="deleteGalleryItem(${index})">✖ DELETE</button>
 </div>
-<img src="${item.img}" alt="${item.caption}" class="gallery-img" onclick="openImgModal('${item.img}')">
-<div class="gallery-caption">${item.caption}</div>
+<img src="${item.img}" alt="${item.caption || ''}" class="gallery-img" onclick="openImgModal('${item.img}')">
+<div class="gallery-caption">${item.caption || ''}</div>
 `;
 container.appendChild(card);
 });
@@ -1347,6 +1362,7 @@ container.appendChild(card);
 
 function renderTrashList() {
 const list = document.getElementById('trash-list');
+if (!list) return;
 list.innerHTML = '';
 if (galleryTrash.length === 0) {
 list.innerHTML = '<div style="color:#666; font-size:0.7rem; padding:5px;">No deleted pictures found.</div>';
@@ -1358,7 +1374,7 @@ const div = document.createElement('div');
 div.className = 'manager-item';
 div.innerHTML = `
 <div class="manager-item-info">
-<span class="manager-item-title">${item.caption}</span>
+<span class="manager-item-title">${item.caption || 'Untitled'}</span>
 </div>
 <div class="manager-item-actions">
 <button class="sm-btn" onclick="restoreGalleryItem(${index})">RESTORE</button>
@@ -1409,10 +1425,10 @@ card.style.backgroundImage = `url('${member.cardBg}')`;
 
 let socialsHtml = '';
 if (member.ig || member.fb) {
-socialsHtml += `<div class="team-socials">`;
+socialsHtml += '<div class="team-socials">';
 if (member.ig) socialsHtml += `<a href="${member.ig}" target="_blank" class="social-icon-btn">${igIcon}</a>`;
 if (member.fb) socialsHtml += `<a href="${member.fb}" target="_blank" class="social-icon-btn">${fbIcon}</a>`;
-socialsHtml += `</div>`;
+socialsHtml += '</div>';
 }
 
 card.innerHTML = `
@@ -1434,6 +1450,7 @@ container.appendChild(tierDiv);
 
 function renderManagerLists() {
 const list = document.getElementById('manager-team-list');
+if (!list) return;
 list.innerHTML = '';
 if (teamMembers.length === 0) {
 list.innerHTML = '<div style="color:#666; font-size:0.7rem; padding:5px;">No team members found.</div>';
@@ -1457,19 +1474,23 @@ list.appendChild(item);
 });
 }
 
-// Background Matrix Canvas Animation
 const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+const ctx = canvas ? canvas.getContext('2d') : null;
+function resizeCanvas() { 
+if (!canvas) return;
+canvas.width = window.innerWidth; 
+canvas.height = window.innerHeight; 
+}
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%';
 const fontSize = 12;
-let columns = Math.floor(canvas.width / fontSize);
+let columns = canvas ? Math.floor(canvas.width / fontSize) : 0;
 let drops = Array(columns).fill(1);
 
 function drawCanvas() {
+if (!ctx || !canvas) return;
 ctx.fillStyle = 'rgba(10, 10, 10, 0.08)';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.fillStyle = '#dc143c';
@@ -1484,7 +1505,6 @@ drops[i]++;
 }
 setInterval(drawCanvas, 33);
 
-// Initialize Cloud Connection
 listenToCloud();
 checkAdminAccess();
 </script>
