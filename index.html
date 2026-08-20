@@ -1271,7 +1271,7 @@ editGalleryIndex = -1;
 
 function saveGalleryItem() {
 if (!isAdminAuthorized) return;
-const caption = document.getElementById('g-caption').value.trim() || "Elevate Photo";
+const caption = document.getElementById('g-caption').value.trim();
 if (!currentGalleryBase64) return alert("Please select an image file.");
 
 const itemData = { img: currentGalleryBase64, caption: caption };
