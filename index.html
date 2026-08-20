@@ -391,8 +391,14 @@ margin: 50px 0 20px 0;
 letter-spacing: 2px;
 }
 
+/* Gallery Toolbar: Hidden by default for regular users */
 .gallery-toolbar {
-display: flex;
+display: none !important;
+}
+
+/* Shows toolbar only when Admin */
+body.is-admin .gallery-toolbar {
+display: flex !important;
 gap: 10px;
 margin-bottom: 25px;
 flex-wrap: wrap;
@@ -1320,7 +1326,7 @@ if (!container) return;
 container.innerHTML = '';
 
 if (galleryItems.length === 0) {
-container.innerHTML = `<div style="grid-column: 1/-1; color:#666; font-size:0.8rem;">Walang pictures pa sa gallery. Click "+ ADD PICTURE" para magdagdag.</div>`;
+container.innerHTML = `<div style="grid-column: 1/-1; color:#666; font-size:0.8rem;">Walang pictures sa gallery.</div>`;
 return;
 }
 
@@ -1483,4 +1489,4 @@ listenToCloud();
 checkAdminAccess();
 </script>
 </body>
-</html>z
+</html>
