@@ -235,6 +235,7 @@ transition: all 0.2s ease;
 .banner-admin-btn:hover { background: crimson; color: #000; }
 body.is-admin .banner-admin-btn { display: block !important; }
 body.is-admin .card-admin-controls { display: flex !important; }
+body.is-admin .gallery-admin-controls { display: flex !important; }
 
 /* Hierarchical Tree Container */
 .team-hierarchy {
@@ -383,8 +384,78 @@ z-index: 10;
 .card-admin-btn { background: rgba(0,0,0,0.6); border: none; color: #fff; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
 .card-admin-btn:hover { color: crimson; background: #000; }
 
+/* --- GALLERY STYLES --- */
+.gallery-section-title {
+color: #e4e4e4;
+margin: 50px 0 20px 0;
+letter-spacing: 2px;
+}
+
+.gallery-toolbar {
+display: flex;
+gap: 10px;
+margin-bottom: 25px;
+flex-wrap: wrap;
+justify-content: center;
+}
+
+.gallery-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+gap: 20px;
+width: 95%;
+max-width: 950px;
+margin-bottom: 50px;
+}
+
+.gallery-card {
+background: rgba(10, 10, 10, 0.85);
+border: 1px solid crimson;
+border-radius: 8px;
+padding: 10px;
+display: flex;
+flex-direction: column;
+align-items: center;
+box-shadow: 0 0 12px rgba(220, 20, 60, 0.3);
+position: relative;
+transition: all 0.3s ease;
+overflow: hidden;
+}
+
+.gallery-card:hover {
+transform: translateY(-4px);
+box-shadow: 0 0 20px rgba(220, 20, 60, 0.7);
+}
+
+.gallery-img {
+width: 100%;
+height: 160px;
+object-fit: cover;
+border-radius: 6px;
+border: 1px solid crimson;
+cursor: pointer;
+background: #111;
+}
+
+.gallery-caption {
+font-size: 0.8rem;
+color: crimson;
+font-weight: bold;
+margin-top: 8px;
+word-break: break-word;
+}
+
+.gallery-admin-controls {
+position: absolute;
+top: 15px;
+right: 15px;
+display: none;
+gap: 5px;
+z-index: 10;
+}
+
 /* Modals Setup */
-#member-modal, #img-modal, #manager-modal, #banner-customize-modal, #btn-customize-modal, #bg-music-modal {
+#member-modal, #img-modal, #manager-modal, #banner-customize-modal, #btn-customize-modal, #bg-music-modal, #gallery-modal, #trash-modal {
 position: fixed;
 top: 0; left: 0;
 width: 100vw; height: 100vh;
@@ -478,6 +549,8 @@ display: block;
 <button class="action-btn" onclick="document.getElementById('top-banner-input').click()">+ SET BANNER IMAGE</button>
 <button class="action-btn" onclick="setMemberPin()">🔑 SET MEMBER PIN</button>
 <button class="action-btn" onclick="openMemberModal()">+ ADD MEMBER</button>
+<button class="action-btn" onclick="openGalleryModal()">🖼 ADD GALLERY PHOTO</button>
+<button class="action-btn" onclick="openTrashModal()">♻ RESTORE DELETED PHOTOS</button>
 <button class="action-btn" onclick="openManagerModal()">⚙ MANAGE DATA</button>
 <button class="action-btn" id="admin-audio-toggle-btn" onclick="toggleAudio()">⏸ PAUSE AUDIO</button>
 <button class="action-btn danger" onclick="resetDatabase()">RESET ALL DATA</button>
@@ -503,6 +576,14 @@ display: block;
 
 <h2 style="color: rgb(228, 228, 228); margin-bottom: 25px;">TEAM</h2>
 <div id="team-hierarchy" class="team-hierarchy"></div>
+
+<!-- GALLERY SECTION -->
+<h2 class="gallery-section-title">GALLERY</h2>
+<div class="gallery-toolbar">
+<button class="sm-btn" onclick="openGalleryModal()">+ ADD PICTURE</button>
+<button class="sm-btn" onclick="openTrashModal()">♻ RESTORE DELETED</button>
+</div>
+<div id="gallery-grid" class="gallery-grid"></div>
 </div>
 
 <!-- Modals -->
@@ -624,6 +705,33 @@ display: block;
 </div>
 </div>
 
+<!-- GALLERY ADD/MODIFY MODAL -->
+<div id="gallery-modal">
+<div class="modal-content">
+<h3 id="gallery-modal-title">ADD GALLERY PHOTO</h3>
+<label>Select Picture</label>
+<input type="file" id="g-img-file" accept="image/gif, image/png, image/jpeg, image/webp" onchange="previewGalleryImg(this)">
+<img id="gallery-preview" class="card-bg-preview-box" src="" alt="Gallery Preview" style="display:none; height:100px;">
+<label style="margin-top:5px;">Caption / Title</label>
+<input type="text" id="g-caption" placeholder="Team Memory / Event Name">
+<div style="display: flex; gap: 8px; margin-top: 10px;">
+<button class="action-btn" style="flex:1; text-align:center;" onclick="saveGalleryItem()">SAVE PHOTO</button>
+<button class="action-btn" style="flex:1; text-align:center;" onclick="closeGalleryModal()">CANCEL</button>
+</div>
+</div>
+</div>
+
+<!-- TRASH / RESTORE MODAL -->
+<div id="trash-modal">
+<div class="modal-content">
+<h3>RESTORE DELETED PHOTOS</h3>
+<div id="trash-list" class="manager-list"></div>
+<div style="display: flex; gap: 8px; margin-top: 15px;">
+<button class="action-btn" style="flex:1; text-align:center;" onclick="closeTrashModal()">CLOSE</button>
+</div>
+</div>
+</div>
+
 <div id="manager-modal">
 <div class="modal-content">
 <h3>MANAGE DATA ENTRIES</h3>
@@ -666,9 +774,13 @@ let isAdminAuthorized = false;
 const audio = document.getElementById('bg-audio');
 let currentAvatarBase64 = "";
 let currentCardBgBase64 = "";
+let currentGalleryBase64 = "";
 let editMemberIndex = -1;
+let editGalleryIndex = -1;
 
 let teamMembers = [ { name: "AKI", role: "Leader / Founder", img: "assets/default-avatar.png", cardBg: "", ig: "", fb: "" } ];
+let galleryItems = [];
+let galleryTrash = [];
 let customTopBanner = "";
 let globalBgMusic = "assets/bg-music.mp3";
 
@@ -682,6 +794,8 @@ const fbIcon = `<svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325
 function saveToDatabase() {
 const fullPayload = {
 teamMembers,
+galleryItems,
+galleryTrash,
 memberAccessPin,
 bannerStyleConfig,
 memberBtnStyleConfig,
@@ -696,24 +810,30 @@ function listenToCloud() {
 db.ref('cyberHubData').on('value', (snapshot) => {
 const data = snapshot.val();
 if (data) {
-    if (data.teamMembers) teamMembers = data.teamMembers;
-    if (data.memberAccessPin) memberAccessPin = data.memberAccessPin;
-    if (data.bannerStyleConfig) bannerStyleConfig = data.bannerStyleConfig;
-    if (data.memberBtnStyleConfig) memberBtnStyleConfig = data.memberBtnStyleConfig;
-    if (data.globalBgMusic) globalBgMusic = data.globalBgMusic;
-    if (data.customTopBanner !== undefined) customTopBanner = data.customTopBanner;
+if (data.teamMembers) teamMembers = data.teamMembers;
+if (data.galleryItems) galleryItems = data.galleryItems;
+if (data.galleryTrash) galleryTrash = data.galleryTrash;
+if (data.memberAccessPin) memberAccessPin = data.memberAccessPin;
+if (data.bannerStyleConfig) bannerStyleConfig = data.bannerStyleConfig;
+if (data.memberBtnStyleConfig) memberBtnStyleConfig = data.memberBtnStyleConfig;
+if (data.globalBgMusic) globalBgMusic = data.globalBgMusic;
+if (data.customTopBanner !== undefined) customTopBanner = data.customTopBanner;
 
-    renderTeam();
-    loadSavedBanner();
-    applyMemberBtnStyles();
+renderTeam();
+renderGallery();
+loadSavedBanner();
+applyMemberBtnStyles();
 
-    if (audio.src !== globalBgMusic) {
-        audio.src = globalBgMusic;
-    }
+if (audio.src !== globalBgMusic) {
+audio.src = globalBgMusic;
+}
 
-    if (document.getElementById('manager-modal').style.display === 'flex') {
-        renderManagerLists();
-    }
+if (document.getElementById('manager-modal').style.display === 'flex') {
+renderManagerLists();
+}
+if (document.getElementById('trash-modal').style.display === 'flex') {
+renderTrashList();
+}
 }
 });
 }
@@ -741,36 +861,32 @@ function showAdminPanel() { document.getElementById('admin-menu-wrapper').style.
 
 // ==================== SHORTCUTS & MOBILE GESTURES ====================
 
-// PC Keyboard Shortcut: Ctrl + Shift + A
 window.addEventListener('keydown', function(e) {
 if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') showAdminPanel();
 });
 
-// Mobile Gesture 1: Triple-Tap Anywhere on Screen
 let mobileTouchCount = 0;
 let mobileTouchTimer = null;
 
 window.addEventListener('touchend', function(e) {
-// Pigilan kung button o input ang tinitip
 if (['BUTTON', 'INPUT', 'A', 'SELECT'].includes(e.target.tagName)) return;
 
 mobileTouchCount++;
 if (mobileTouchCount === 1) {
-    mobileTouchTimer = setTimeout(() => { mobileTouchCount = 0; }, 500);
+mobileTouchTimer = setTimeout(() => { mobileTouchCount = 0; }, 500);
 } else if (mobileTouchCount === 3) {
-    clearTimeout(mobileTouchTimer);
-    mobileTouchCount = 0;
-    showAdminPanel();
+clearTimeout(mobileTouchTimer);
+mobileTouchCount = 0;
+showAdminPanel();
 }
 });
 
-// Mobile Gesture 2: Long Press (2 Seconds) Anywhere on Screen
 let longPressTimer;
 
 window.addEventListener('touchstart', function(e) {
 if (['BUTTON', 'INPUT', 'A', 'SELECT'].includes(e.target.tagName)) return;
 longPressTimer = setTimeout(() => {
-    showAdminPanel();
+showAdminPanel();
 }, 2000);
 });
 
@@ -791,8 +907,8 @@ const file = input.files[0];
 if (file) {
 const reader = new FileReader();
 reader.onload = function(e) {
-    globalBgMusic = e.target.result;
-    document.getElementById('bg-music-url').value = "[ Local File Loaded ]";
+globalBgMusic = e.target.result;
+document.getElementById('bg-music-url').value = "[ Local File Loaded ]";
 };
 reader.readAsDataURL(file);
 }
@@ -877,9 +993,9 @@ const file = input.files[0];
 if (file) {
 const reader = new FileReader();
 reader.onload = function(e) {
-    customTopBanner = e.target.result;
-    saveToDatabase();
-    input.value = "";
+customTopBanner = e.target.result;
+saveToDatabase();
+input.value = "";
 };
 reader.readAsDataURL(file);
 }
@@ -945,12 +1061,12 @@ const dropdown = document.getElementById('admin-dropdown');
 if (!isAdminAuthorized) {
 const pinInput = prompt("ENTER ADMIN SECURITY PIN:");
 if (pinInput === ADMIN_PIN) {
-    isAdminAuthorized = true;
-    document.body.classList.add('is-admin');
-    dropdown.classList.add('active');
-    alert("Admin Granted.");
+isAdminAuthorized = true;
+document.body.classList.add('is-admin');
+dropdown.classList.add('active');
+alert("Admin Granted.");
 } else if (pinInput !== null) {
-    alert("ACCESS DENIED: Wrong PIN.");
+alert("ACCESS DENIED: Wrong PIN.");
 }
 } else {
 dropdown.classList.toggle('active');
@@ -979,6 +1095,8 @@ function resetDatabase() {
 if (!isAdminAuthorized) return;
 if (confirm("Reset ALL stored cloud data?")) {
 teamMembers = [];
+galleryItems = [];
+galleryTrash = [];
 customTopBanner = "";
 globalBgMusic = "assets/bg-music.mp3";
 memberAccessPin = "1234";
@@ -993,8 +1111,8 @@ const file = input.files[0];
 if (file) {
 const reader = new FileReader();
 reader.onload = function(e) {
-    currentAvatarBase64 = e.target.result;
-    document.getElementById('avatar-preview').src = currentAvatarBase64;
+currentAvatarBase64 = e.target.result;
+document.getElementById('avatar-preview').src = currentAvatarBase64;
 };
 reader.readAsDataURL(file);
 }
@@ -1005,10 +1123,10 @@ const file = input.files[0];
 if (file) {
 const reader = new FileReader();
 reader.onload = function(e) {
-    currentCardBgBase64 = e.target.result;
-    const bgPrev = document.getElementById('card-bg-preview');
-    bgPrev.src = currentCardBgBase64;
-    bgPrev.style.display = 'block';
+currentCardBgBase64 = e.target.result;
+const bgPrev = document.getElementById('card-bg-preview');
+bgPrev.src = currentCardBgBase64;
+bgPrev.style.display = 'block';
 };
 reader.readAsDataURL(file);
 }
@@ -1039,11 +1157,11 @@ document.getElementById('avatar-preview').src = member.img || '';
 currentCardBgBase64 = member.cardBg || '';
 const bgPrev = document.getElementById('card-bg-preview');
 if (currentCardBgBase64) {
-    bgPrev.src = currentCardBgBase64;
-    bgPrev.style.display = 'block';
+bgPrev.src = currentCardBgBase64;
+bgPrev.style.display = 'block';
 } else {
-    bgPrev.src = '';
-    bgPrev.style.display = 'none';
+bgPrev.src = '';
+bgPrev.style.display = 'none';
 }
 } else {
 document.getElementById('modal-title').textContent = "ADD CREW MEMBER";
@@ -1103,6 +1221,148 @@ saveToDatabase();
 }
 }
 
+// ==================== GALLERY FUNCTIONS ====================
+
+function previewGalleryImg(input) {
+const file = input.files[0];
+if (file) {
+const reader = new FileReader();
+reader.onload = function(e) {
+currentGalleryBase64 = e.target.result;
+const prev = document.getElementById('gallery-preview');
+prev.src = currentGalleryBase64;
+prev.style.display = 'block';
+};
+reader.readAsDataURL(file);
+}
+}
+
+function openGalleryModal(index = -1) {
+if (!isAdminAuthorized) return;
+editGalleryIndex = index;
+if (index >= 0 && index < galleryItems.length) {
+const item = galleryItems[index];
+document.getElementById('gallery-modal-title').textContent = "EDIT GALLERY PHOTO";
+document.getElementById('g-caption').value = item.caption || '';
+currentGalleryBase64 = item.img || '';
+const prev = document.getElementById('gallery-preview');
+prev.src = currentGalleryBase64;
+prev.style.display = 'block';
+} else {
+document.getElementById('gallery-modal-title').textContent = "ADD GALLERY PHOTO";
+document.getElementById('g-caption').value = '';
+currentGalleryBase64 = '';
+document.getElementById('gallery-preview').style.display = 'none';
+}
+document.getElementById('gallery-modal').style.display = 'flex';
+}
+
+function closeGalleryModal() {
+document.getElementById('gallery-modal').style.display = 'none';
+currentGalleryBase64 = '';
+editGalleryIndex = -1;
+}
+
+function saveGalleryItem() {
+if (!isAdminAuthorized) return;
+const caption = document.getElementById('g-caption').value.trim() || "Elevate Photo";
+if (!currentGalleryBase64) return alert("Please select an image file.");
+
+const itemData = { img: currentGalleryBase64, caption: caption };
+
+if (editGalleryIndex >= 0 && editGalleryIndex < galleryItems.length) {
+galleryItems[editGalleryIndex] = itemData;
+} else {
+galleryItems.push(itemData);
+}
+
+saveToDatabase();
+closeGalleryModal();
+}
+
+function deleteGalleryItem(index) {
+if (!isAdminAuthorized) return;
+if (confirm("Move this picture to deleted bin?")) {
+const item = galleryItems.splice(index, 1)[0];
+galleryTrash.push(item);
+saveToDatabase();
+}
+}
+
+function openTrashModal() {
+if (!isAdminAuthorized) return;
+renderTrashList();
+document.getElementById('trash-modal').style.display = 'flex';
+}
+
+function closeTrashModal() {
+document.getElementById('trash-modal').style.display = 'none';
+}
+
+function restoreGalleryItem(trashIndex) {
+if (!isAdminAuthorized) return;
+const item = galleryTrash.splice(trashIndex, 1)[0];
+galleryItems.push(item);
+saveToDatabase();
+}
+
+function permanentlyDeleteTrash(trashIndex) {
+if (!isAdminAuthorized) return;
+if (confirm("Permanently remove this picture?")) {
+galleryTrash.splice(trashIndex, 1);
+saveToDatabase();
+}
+}
+
+function renderGallery() {
+const container = document.getElementById('gallery-grid');
+if (!container) return;
+container.innerHTML = '';
+
+if (galleryItems.length === 0) {
+container.innerHTML = `<div style="grid-column: 1/-1; color:#666; font-size:0.8rem;">Walang pictures pa sa gallery. Click "+ ADD PICTURE" para magdagdag.</div>`;
+return;
+}
+
+galleryItems.forEach((item, index) => {
+const card = document.createElement('div');
+card.className = 'gallery-card';
+card.innerHTML = `
+<div class="gallery-admin-controls">
+<button class="card-admin-btn" onclick="openGalleryModal(${index})">✏ EDIT</button>
+<button class="card-admin-btn" onclick="deleteGalleryItem(${index})">✖ DELETE</button>
+</div>
+<img src="${item.img}" alt="${item.caption}" class="gallery-img" onclick="openImgModal('${item.img}')">
+<div class="gallery-caption">${item.caption}</div>
+`;
+container.appendChild(card);
+});
+}
+
+function renderTrashList() {
+const list = document.getElementById('trash-list');
+list.innerHTML = '';
+if (galleryTrash.length === 0) {
+list.innerHTML = '<div style="color:#666; font-size:0.7rem; padding:5px;">No deleted pictures found.</div>';
+return;
+}
+
+galleryTrash.forEach((item, index) => {
+const div = document.createElement('div');
+div.className = 'manager-item';
+div.innerHTML = `
+<div class="manager-item-info">
+<span class="manager-item-title">${item.caption}</span>
+</div>
+<div class="manager-item-actions">
+<button class="sm-btn" onclick="restoreGalleryItem(${index})">RESTORE</button>
+<button class="sm-btn" onclick="permanentlyDeleteTrash(${index})">PERMANENT DELETE</button>
+</div>
+`;
+list.appendChild(div);
+});
+}
+
 function openImgModal(src) {
 if (!src) return;
 document.getElementById('modal-img').src = src;
@@ -1133,33 +1393,33 @@ tierDiv.className = 'hierarchy-tier';
 tierDiv.setAttribute('data-tier', tier.level);
 
 tier.members.forEach((member) => {
-    const globalIndex = teamMembers.indexOf(member);
-    const card = document.createElement('div');
-    card.className = 'team-card';
+const globalIndex = teamMembers.indexOf(member);
+const card = document.createElement('div');
+card.className = 'team-card';
 
-    if (member.cardBg) {
-        card.style.backgroundImage = `url('${member.cardBg}')`;
-    }
+if (member.cardBg) {
+card.style.backgroundImage = `url('${member.cardBg}')`;
+}
 
-    let socialsHtml = '';
-    if (member.ig || member.fb) {
-        socialsHtml += `<div class="team-socials">`;
-        if (member.ig) socialsHtml += `<a href="${member.ig}" target="_blank" class="social-icon-btn">${igIcon}</a>`;
-        if (member.fb) socialsHtml += `<a href="${member.fb}" target="_blank" class="social-icon-btn">${fbIcon}</a>`;
-        socialsHtml += `</div>`;
-    }
+let socialsHtml = '';
+if (member.ig || member.fb) {
+socialsHtml += `<div class="team-socials">`;
+if (member.ig) socialsHtml += `<a href="${member.ig}" target="_blank" class="social-icon-btn">${igIcon}</a>`;
+if (member.fb) socialsHtml += `<a href="${member.fb}" target="_blank" class="social-icon-btn">${fbIcon}</a>`;
+socialsHtml += `</div>`;
+}
 
-    card.innerHTML = `
-        <div class="card-admin-controls">
-            <button class="card-admin-btn" onclick="openMemberModal(${globalIndex})">✏</button>
-            <button class="card-admin-btn" onclick="deleteMember(${globalIndex})">✖</button>
-        </div>
-        <img src="${member.img}" alt="${member.name}" class="team-avatar" onclick="openImgModal('${member.img}')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'80\\' height=\\'80\\'><rect width=\\'80\\' height=\\'80\\' fill=\\'%23111\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%23dc143c\\' font-size=\\'12\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>NO IMG</text></svg>'">
-        <div class="team-name">${member.name}</div>
-        <div class="team-role">${member.role}</div>
-        <div class="team-actions">${socialsHtml}</div>
-    `;
-    tierDiv.appendChild(card);
+card.innerHTML = `
+<div class="card-admin-controls">
+<button class="card-admin-btn" onclick="openMemberModal(${globalIndex})">✏</button>
+<button class="card-admin-btn" onclick="deleteMember(${globalIndex})">✖</button>
+</div>
+<img src="${member.img}" alt="${member.name}" class="team-avatar" onclick="openImgModal('${member.img}')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'80\\' height=\\'80\\'><rect width=\\'80\\' height=\\'80\\' fill=\\'%23111\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%23dc143c\\' font-size=\\'12\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>NO IMG</text></svg>'">
+<div class="team-name">${member.name}</div>
+<div class="team-role">${member.role}</div>
+<div class="team-actions">${socialsHtml}</div>
+`;
+tierDiv.appendChild(card);
 });
 
 container.appendChild(tierDiv);
@@ -1178,14 +1438,14 @@ teamMembers.forEach((member, index) => {
 const item = document.createElement('div');
 item.className = 'manager-item';
 item.innerHTML = `
-    <div class="manager-item-info">
-        <span class="manager-item-title">${member.name}</span>
-        <span class="manager-item-sub">${member.role}</span>
-    </div>
-    <div class="manager-item-actions">
-        <button class="sm-btn" onclick="openMemberModal(${index})">EDIT</button>
-        <button class="sm-btn" onclick="deleteMember(${index})">DELETE</button>
-    </div>
+<div class="manager-item-info">
+<span class="manager-item-title">${member.name}</span>
+<span class="manager-item-sub">${member.role}</span>
+</div>
+<div class="manager-item-actions">
+<button class="sm-btn" onclick="openMemberModal(${index})">EDIT</button>
+<button class="sm-btn" onclick="deleteMember(${index})">DELETE</button>
+</div>
 `;
 list.appendChild(item);
 });
@@ -1223,4 +1483,4 @@ listenToCloud();
 checkAdminAccess();
 </script>
 </body>
-</html>
+</html>z
