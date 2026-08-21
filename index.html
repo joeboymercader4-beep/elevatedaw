@@ -698,6 +698,8 @@ display: block;
 <input type="text" id="m-ig" placeholder="https://instagram.com/yourusername">
 <label>Facebook Profile URL</label>
 <input type="text" id="m-fb" placeholder="https://facebook.com/yourprofile">
+<label>Discord Profile or Server Link</label>
+<input type="text" id="m-discord" placeholder="https://discord.gg/yourinvite or profile link">
 <div style="display: flex; gap: 8px; margin-top: 10px;">
 <button class="action-btn" style="flex:1; text-align:center;" onclick="saveMember()">SAVE</button>
 <button class="action-btn" style="flex:1; text-align:center;" onclick="closeMemberModal()">CANCEL</button>
@@ -759,7 +761,6 @@ appId: "1:321202812524:web:9dae041613662f2d0cca49",
 measurementId: "G-N2W12BCXVW"
 };
 
-// Safety Check para sa Firebase Initialization
 if (typeof firebase !== 'undefined' && !firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -776,7 +777,7 @@ let currentGalleryBase64 = "";
 let editMemberIndex = -1;
 let editGalleryIndex = -1;
 
-let teamMembers = [ { name: "AKI", role: "Leader / Founder", img: "assets/default-avatar.png", cardBg: "", ig: "", fb: "" } ];
+let teamMembers = [ { name: "AKI", role: "Leader / Founder", img: "assets/default-avatar.png", cardBg: "", ig: "", fb: "", discord: "" } ];
 let galleryItems = [];
 let galleryTrash = [];
 let customTopBanner = "";
@@ -787,6 +788,7 @@ let memberBtnStyleConfig = { bg: "rgba(220, 20, 60, 0.1)", color: "#dc143c", bor
 
 const igIcon = '<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>';
 const fbIcon = '<svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>';
+const discordIcon = '<svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
 
 function saveToDatabase() {
 if (!db) {
@@ -1148,7 +1150,6 @@ bgPrev.src = "";
 bgPrev.style.display = 'none';
 }
 
-/* FIX 1: TIYAKING NAKA-RESET ANG INDEX KAPAG BAGO AT TIKMAN NA PARATING MAY DEFAULT ROUTE */
 function openMemberModal(index = -1) { 
 if(!isAdminAuthorized) return;
 
@@ -1161,6 +1162,7 @@ document.getElementById('m-name').value = member.name || '';
 document.getElementById('m-role').value = member.role || '';
 document.getElementById('m-ig').value = member.ig || '';
 document.getElementById('m-fb').value = member.fb || '';
+document.getElementById('m-discord').value = member.discord || '';
 currentAvatarBase64 = member.img || '';
 document.getElementById('avatar-preview').src = member.img || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
@@ -1179,6 +1181,7 @@ document.getElementById('m-name').value = '';
 document.getElementById('m-role').value = '';
 document.getElementById('m-ig').value = '';
 document.getElementById('m-fb').value = '';
+document.getElementById('m-discord').value = '';
 document.getElementById('m-img-file').value = '';
 document.getElementById('m-card-bg-file').value = '';
 currentAvatarBase64 = "";
@@ -1202,7 +1205,6 @@ document.getElementById('manager-modal').style.display = 'flex';
 }
 function closeManagerModal() { document.getElementById('manager-modal').style.display = 'none'; }
 
-/* FIX 2: VALIDATION CHECK PARA SA FILE SIZE O BASE64 STRING LENGTH */
 function saveMember() {
 if (!isAdminAuthorized) return;
 const name = document.getElementById('m-name').value.trim();
@@ -1211,16 +1213,16 @@ const img = currentAvatarBase64 || 'assets/default-avatar.png';
 const cardBg = currentCardBgBase64 || '';
 const ig = document.getElementById('m-ig').value.trim();
 const fb = document.getElementById('m-fb').value.trim();
+const discord = document.getElementById('m-discord').value.trim();
 
 if (!name) return alert("Please enter a name.");
 
-// Pinipigilan ang sobrang laking GIF/Image base64 para hindi masira ang Realtime Database
 const totalBase64Len = img.length + cardBg.length;
 if (totalBase64Len > 2500000) { 
-return alert("Masyadong malaki ang in-upload na Card Background/Avatar! Paki-maliitan ang GIF/Image size o pumili ng mas maliit na file.");
+return alert("GIF/IMAGE SIZE OVERLOADING! CHANGE IT.");
 }
 
-const memberData = { name, role, img, cardBg, ig, fb };
+const memberData = { name, role, img, cardBg, ig, fb, discord };
 
 if (editMemberIndex >= 0 && editMemberIndex < teamMembers.length) {
 teamMembers[editMemberIndex] = memberData;
@@ -1286,7 +1288,7 @@ const caption = document.getElementById('g-caption').value.trim();
 if (!currentGalleryBase64) return alert("Please select an image file.");
 
 if (currentGalleryBase64.length > 2500000) {
-return alert("Masyadong malaki ang Gallery Image file! Pumili ng mas maliit na photo/GIF.");
+return alert("Too much image/gif size!.");
 }
 
 const itemData = { img: currentGalleryBase64, caption: caption };
@@ -1424,10 +1426,11 @@ card.style.backgroundImage = `url('${member.cardBg}')`;
 }
 
 let socialsHtml = '';
-if (member.ig || member.fb) {
+if (member.ig || member.fb || member.discord) {
 socialsHtml += '<div class="team-socials">';
 if (member.ig) socialsHtml += `<a href="${member.ig}" target="_blank" class="social-icon-btn">${igIcon}</a>`;
 if (member.fb) socialsHtml += `<a href="${member.fb}" target="_blank" class="social-icon-btn">${fbIcon}</a>`;
+if (member.discord) socialsHtml += `<a href="${member.discord}" target="_blank" class="social-icon-btn">${discordIcon}</a>`;
 socialsHtml += '</div>';
 }
 
